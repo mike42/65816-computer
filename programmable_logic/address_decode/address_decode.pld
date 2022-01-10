@@ -1,0 +1,27 @@
+GAL22V10
+AddrDecode
+
+Clock  RW     NC     NC     A19    A18    A17    A16    A15    A14    A13    GND
+NC     /RAMCS /ROMCS /IOCS  /RD    /WR    NC     NC     NC     NC     NC     VCC
+
+; ROM is the top 8 KiB of bank 0.
+; prefix is 0000 111xxxxx xxxxxxxx
+ROMCS = /A19*/A18*/A17*/A16*A15*A14*A13
+
+; IO addresses are mapped below ROM in bank 0.
+; prefix is 0000 110xxxxx xxxxxxxx
+IOCS = /A19*/A18*/A17*/A16*A15*A14*/A13
+
+; RAM is selected for any address does *not* match 0000 11xxxxxx xxxxxxxx
+RAMCS = A19 + A18 + A17 + A16 + /A15 + /A14
+
+; Qualify writes with clock
+RD = RW
+WR = Clock*/RW
+
+DESCRIPTION
+
+Address decode logic for 65C816 computer.
+
+ROM is top 8K of bank 0, I/O is 8k below that, everything else is RAM.
+
