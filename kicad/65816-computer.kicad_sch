@@ -246,31 +246,31 @@
       (reference "#PWR032") (unit 1) (value "GND") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061e490c8/00000000-0000-0000-0000-0000620c2966"
-      (reference "C1") (unit 1) (value "C") (footprint "")
+      (reference "C1") (unit 1) (value "0.1 µF") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061e490c8/00000000-0000-0000-0000-0000620c3076"
-      (reference "C2") (unit 1) (value "C") (footprint "")
+      (reference "C2") (unit 1) (value "0.1 µF") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061e490c8/00000000-0000-0000-0000-0000620c38fb"
-      (reference "C3") (unit 1) (value "C") (footprint "")
+      (reference "C3") (unit 1) (value "0.1 µF") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061e490c8/00000000-0000-0000-0000-0000620c3fdb"
-      (reference "C4") (unit 1) (value "C") (footprint "")
+      (reference "C4") (unit 1) (value "0.1 µF") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061e490c8/00000000-0000-0000-0000-0000620c48fe"
-      (reference "C5") (unit 1) (value "C") (footprint "")
+      (reference "C5") (unit 1) (value "0.1 µF") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061ea29ab/00000000-0000-0000-0000-000061f36a3f"
-      (reference "C6") (unit 1) (value "C") (footprint "")
+      (reference "C6") (unit 1) (value "0.1 µF") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061ea29ab/00000000-0000-0000-0000-000061f3719c"
-      (reference "C7") (unit 1) (value "C") (footprint "")
+      (reference "C7") (unit 1) (value "0.1 µF") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061ea29ab/00000000-0000-0000-0000-000061f37706"
-      (reference "C8") (unit 1) (value "C") (footprint "")
+      (reference "C8") (unit 1) (value "0.1 µF") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061ea29ab/00000000-0000-0000-0000-000061f37cef"
-      (reference "C9") (unit 1) (value "C") (footprint "")
+      (reference "C9") (unit 1) (value "0.1 µF") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061e490c8/00000000-0000-0000-0000-000062076f1a"
       (reference "D1") (unit 1) (value "LED") (footprint "")

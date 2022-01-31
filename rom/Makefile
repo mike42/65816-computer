@@ -10,7 +10,7 @@ rom.bin: main.o system.cfg
 	truncate -s 32768 rom.bin
 
 main.o: main.s
-	$(CA65) main.s
+	$(CA65) --cpu 65816 main.s
 
 clean:
 	rm -f main.o rom.bin

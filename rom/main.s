@@ -3,30 +3,40 @@ PORTA = $c001
 DDRB = $c002
 DDRA = $c003
 
-SOME_ADDRESS_IN_RAM = $beef
-
-E = %10000000
-RW = %01000000
-RS = %00100000
-
 .segment "CODE"
+.a8
+.i8
 
-; Write 42 to VIA port B
 reset:
-  lda #%11111111 ; Set all pins to output
+  ; switch to native mode
+  clc
+  xce
+  ; use 8-bit accumulator and index registers
+  sep #%0011000
+
+  ; Set all VIA pins to output
+  lda #%11111111
+  sta DDRA
   sta DDRB
 
-  lda #42
-  sta PORTB
+;  jmp task_1_main
+   jmp task_2_main
 
-  lda #00
-  sta SOME_ADDRESS_IN_RAM
+task_1_main:
+@repeat_1:
+  lda #%00000000
+  sta PORTA
+  lda #%00000011
+  sta PORTA
+  jmp @repeat_1
 
-loop:
-  inc SOME_ADDRESS_IN_RAM
-  lda SOME_ADDRESS_IN_RAM
+task_2_main:
+  lda #%01010101
+@repeat_2:
+  ror
   sta PORTB
-  jmp loop
+  jmp @repeat_2
+
 
 nmi:
   rti
