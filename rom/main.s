@@ -9,7 +9,7 @@ IFR = $c00b
 IER = $c00e
 
 .segment "BSS"
-next_task_sp: .res 2       ; Stack pointer of other task
+next_task_sp: .res 2              ; Stack pointer of whichever task is not currently running
 temp: .res 2
 
 .segment "CODE"
@@ -20,24 +20,13 @@ reset:
   ; Save context as if we are at task_2_main, so we can switch to it later.
   .a16                            ; use 16-bit accumulator and index registers
   .i16
-  rep #%0011000
+  rep #%00110000
   lda #$3000                      ; set up stack, direct page at $3000
   tcs
   tcd
   ; emulate what is pushed to the stack before NMI is called: progam bank, program counter, processor status register
-  ; TODO suspect that there is a problem here..
   phk                             ; program bank register, same as current code, will be 0 here.
-  .a8                             ; use 8-bit accumulator and index registers
-  .i8
-  sep #%0011000
-  lda #>task_2_main
-  pha
-  lda #<task_2_main
-  pha
-  ;  pea task_2_main                 ; 16 bit program counter for the start of this task
-  .a16                            ; use 16-bit accumulator and index registers
-  .i16
-  rep #%0011000
+  pea task_2_main                 ; 16 bit program counter for the start of this task
   php                             ; processor status register
   ; match what we push to the stack in the nmi routine
   lda #0
@@ -51,9 +40,6 @@ reset:
   tsc                             ; save stack pointer to next_task_sp
   sta next_task_sp
 
-  .a16                            ; use 16-bit accumulator and index registers
-  .i16
-  rep #%00110000
   lda #$2000                      ; set up stack, direct page at $2000 for task_2_main
   tcs
   tcd
@@ -66,19 +52,18 @@ reset:
   sta DDRA
   sta DDRB
   ; set up timer 1
-  lda #%01000000                 ; set ACR. first two bits = 01 is continuous interrupts for T1
+  lda #%01000000                  ; set ACR. first two bits = 01 is continuous interrupts for T1
   sta ACR
-  lda #%11000000                ; enable VIA interrupt for T1
+  lda #%11000000                  ; enable VIA interrupt for T1
   sta IER
   ; set up a timer at ~65535 clock pulses.
-  lda #$ff                      ; set T1 low-order counter
+  lda #$ff                        ; set T1 low-order counter
   sta T1C_L
-  lda #$ff                      ; set T1 high-order counter
+  lda #$ff                        ; set T1 high-order counter
   sta T1C_H
 
   ; start running task 1
   jmp task_1_main
-; jmp task_2_main
 
 ; Task 1
 task_1_main:
@@ -97,6 +82,7 @@ task_2_main:
   .a8                             ; use 8-bit accumulator and index registers
   .i8
   sep #%00110000
+  clc
   lda #%01010101                  ; grab a start value
 @repeat_2:
   ror                             ; rotate right
@@ -108,39 +94,33 @@ nmi:
   .i16
   rep #%00110000
   ; Save task context to stack
-  pha       ; Push A, X, Y
+  pha                             ; Push A, X, Y
   phx
   phy
-  phb       ; Push data bank, direct register
+  phb                             ; Push data bank, direct register
   phd
 
-  ; Return to same task
-  tsc
-  sta next_task_sp
-  lda next_task_sp
-  tcs
-
   ; swap stack pointer so that we will restore the other task
-;  tsc                     ; transfer current stack pointer to memory
-;  sta temp
-;  lda next_task_sp        ; load next stack pointer from memory
-;  tcs
-;  lda temp                ; previous task is up next
-;  sta next_task_sp
+  tsc                             ; transfer current stack pointer to memory
+  sta temp
+  lda next_task_sp                ; load next stack pointer from memory
+  tcs
+  lda temp                        ; previous task is up next
+  sta next_task_sp
 
   ; Clear interrut
   .a8
   .i8
-  sep #%00110000  ; save X only (assumes it is 8 bits..)
-  ldx T1C_L       ; Clear the interrupt, side-effect of reading
+  sep #%00110000                  ; save X only (assumes it is 8 bits..)
+  ldx T1C_L                       ; Clear the interrupt, side-effect of reading
 
   .a16
   .i16
   rep #%00110000
   ; Restore process context from stack, reverse order
-  pld       ; Pull direct register, data bank
+  pld                             ; Pull direct register, data bank
   plb
-  ply       ; Pull Y, X, A
+  ply                             ; Pull Y, X, A
   plx
   pla
   rti
@@ -148,26 +128,26 @@ nmi:
 irq:
   rti
 
-unused_interrupt:  ; Probably make this into a crash.
+unused_interrupt:                 ; Probably make this into a crash.
   rti
 
 .segment "VECTORS"
 ; native mode interrupt vectors
-.word unused_interrupt ; Reserved
-.word unused_interrupt ; Reserved
-.word unused_interrupt ; COP
-.word unused_interrupt ; BRK
-.word unused_interrupt ; Abort
-.word nmi              ; NMI
-.word unused_interrupt ; Reserved
-.word irq              ; IRQ
+.word unused_interrupt            ; Reserved
+.word unused_interrupt            ; Reserved
+.word unused_interrupt            ; COP
+.word unused_interrupt            ; BRK
+.word unused_interrupt            ; Abort
+.word nmi                         ; NMI
+.word unused_interrupt            ; Reserved
+.word irq                         ; IRQ
 
 ; emulation mode interrupt vectors
-.word unused_interrupt ; Reserved
-.word unused_interrupt ; Reserved
-.word unused_interrupt ; COP
-.word unused_interrupt ; Reserved
-.word unused_interrupt ; Abort
-.word unused_interrupt ; NMI
-.word reset            ; Reset
-.word unused_interrupt ; IRQ/BRK
+.word unused_interrupt            ; Reserved
+.word unused_interrupt            ; Reserved
+.word unused_interrupt            ; COP
+.word unused_interrupt            ; Reserved
+.word unused_interrupt            ; Abort
+.word unused_interrupt            ; NMI
+.word reset                       ; Reset
+.word unused_interrupt            ; IRQ/BRK
