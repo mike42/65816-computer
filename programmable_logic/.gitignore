@@ -1,3 +1,6 @@
 *.chp
 *.fus
 *.pin
+*.csv
+*.lib
+*.jed
