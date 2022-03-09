@@ -1,5 +1,6 @@
 #include "Log.h"
 #include "Ram.h"
+#include "Rom.h"
 
 #include <Interrupt.h>
 #include <SystemBus.h>
@@ -37,7 +38,10 @@ int main(int argc, char **argv) {
     ram.storeByte(Address(0x00, 0x0003), 0x65);
     ram.storeByte(Address(0x00, 0x0004), 0x12);
 
+    Rom rom = Rom("../rom/rom.bin");
+
     SystemBus systemBus = SystemBus();
+    systemBus.registerDevice(&rom);
     systemBus.registerDevice(&ram);
 
     Cpu65816 cpu(systemBus, &emulationInterrupts, &nativeInterrupts);

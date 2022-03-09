@@ -17,5 +17,4 @@ public:
     bool decodeAddress(const Address &, Address &);
 };
 
-
 #endif //EMULATOR_RAM_H

@@ -1,7 +1,3 @@
-//
-// Created by Francesco Rigoni on 05/03/2018.
-//
-
 #include "Ram.h"
 
 Ram::Ram(uint8_t banks) {

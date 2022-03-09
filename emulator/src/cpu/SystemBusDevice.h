@@ -23,7 +23,6 @@
 #include <cstdint>
 
 #define BANK_SIZE_BYTES                0x10000
-#define HALF_BANK_SIZE_BYTES            0x8000
 #define PAGE_SIZE_BYTES                    256
 
 class Address {
