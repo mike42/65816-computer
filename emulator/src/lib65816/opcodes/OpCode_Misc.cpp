@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeMisc"
 
@@ -27,16 +27,16 @@
 
 void Cpu65816::executeMisc(OpCode &opCode) {
     switch (opCode.getCode()) {
-        case(0xEB):     // XBA
+        case (0xEB):     // XBA
         {
             uint8_t lowerA = Binary::lower8BitsOf(mA);
             uint8_t higherA = Binary::higher8BitsOf(mA);
-            mA = higherA | (((uint16_t)(lowerA)) << 8);
+            mA = higherA | (((uint16_t) (lowerA)) << 8);
             mCpuStatus.updateSignAndZeroFlagFrom8BitValue(higherA);
             addToProgramAddressAndCycles(1, 3);
             break;
         }
-        case(0xDB):     // STP
+        case (0xDB):     // STP
         {
             reset();
             addToProgramAddress(1);
@@ -44,7 +44,7 @@ void Cpu65816::executeMisc(OpCode &opCode) {
             break;
 
         }
-        case(0xCB):     // WAI
+        case (0xCB):     // WAI
         {
             setRDYPin(false);
 
@@ -52,19 +52,19 @@ void Cpu65816::executeMisc(OpCode &opCode) {
             addToCycles(3);
             break;
         }
-        case(0x42):     // WDM
+        case (0x42):     // WDM
         {
             addToProgramAddress(2);
             addToCycles(2);
             break;
         }
-        case(0xEA):     // NOP
+        case (0xEA):     // NOP
         {
             addToProgramAddress(1);
             addToCycles(2);
             break;
         }
-        case(0x44):     // MVP
+        case (0x44):     // MVP
         {
             Address addressOfOpCodeData = getAddressOfOpCodeData(opCode);
             uint8_t destinationBank = mSystemBus.readByte(addressOfOpCodeData);
@@ -74,7 +74,7 @@ void Cpu65816::executeMisc(OpCode &opCode) {
             Address sourceAddress(sourceBank, mX);
             Address destinationAddress(destinationBank, mY);
 
-            while(mA != 0xFFFF) {
+            while (mA != 0xFFFF) {
                 uint8_t toTransfer = mSystemBus.readByte(sourceAddress);
                 mSystemBus.storeByte(destinationAddress, toTransfer);
 
@@ -89,7 +89,7 @@ void Cpu65816::executeMisc(OpCode &opCode) {
             addToProgramAddress(3);
             break;
         }
-        case(0x54):     // MVN
+        case (0x54):     // MVN
         {
             Address addressOfOpCodeData = getAddressOfOpCodeData(opCode);
             uint8_t destinationBank = mSystemBus.readByte(addressOfOpCodeData);
@@ -99,7 +99,7 @@ void Cpu65816::executeMisc(OpCode &opCode) {
             Address sourceAddress(sourceBank, mX);
             Address destinationAddress(destinationBank, mY);
 
-            while(mA != 0xFFFF) {
+            while (mA != 0xFFFF) {
                 uint8_t toTransfer = mSystemBus.readByte(sourceAddress);
                 mSystemBus.storeByte(destinationAddress, toTransfer);
 
@@ -114,8 +114,7 @@ void Cpu65816::executeMisc(OpCode &opCode) {
             addToProgramAddress(3);
             break;
         }
-        default:
-        {
+        default: {
             LOG_UNEXPECTED_OPCODE(opCode);
         }
     }

@@ -17,8 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Stack.hpp"
-#include "Log.hpp"
+#include "Stack.h"
+#include "Log.h"
 
 #define LOG_TAG "Stack"
 
@@ -40,8 +40,8 @@ void Stack::push8Bit(uint8_t value) {
 }
 
 void Stack::push16Bit(uint16_t value) {
-    auto leastSignificant = (uint8_t)((value) & 0xFF);
-    auto mostSignificant =  (uint8_t)(((value) & 0xFF00) >> 8);
+    auto leastSignificant = (uint8_t) ((value) & 0xFF);
+    auto mostSignificant = (uint8_t) (((value) & 0xFF00) >> 8);
     push8Bit(mostSignificant);
     push8Bit(leastSignificant);
 }
@@ -52,7 +52,7 @@ uint8_t Stack::pull8Bit() {
 }
 
 uint16_t Stack::pull16Bit() {
-    return (uint16_t)(pull8Bit() | (((uint16_t)pull8Bit()) << 8));
+    return (uint16_t) (pull8Bit() | (((uint16_t) pull8Bit()) << 8));
 }
 
 uint16_t Stack::getStackPointer() {

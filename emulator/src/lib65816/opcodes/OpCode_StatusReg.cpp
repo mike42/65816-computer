@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeStatusReg"
 
@@ -28,7 +28,7 @@
 
 void Cpu65816::executeStatusReg(OpCode &opCode) {
     switch (opCode.getCode()) {
-        case(0xC2):  // REP #const
+        case (0xC2):  // REP #const
         {
             uint8_t value = mSystemBus.readByte(getAddressOfOpCodeData(opCode));
             uint8_t statusByte = mCpuStatus.getRegisterValue();
@@ -36,31 +36,31 @@ void Cpu65816::executeStatusReg(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 3);
             break;
         }
-        case(0x38):  // SEC
+        case (0x38):  // SEC
         {
             mCpuStatus.setCarryFlag();
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0xF8):  // SED
+        case (0xF8):  // SED
         {
             mCpuStatus.setDecimalFlag();
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0x78):  // SEI
+        case (0x78):  // SEI
         {
             mCpuStatus.setInterruptDisableFlag();
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0x58):  // CLI
+        case (0x58):  // CLI
         {
             mCpuStatus.clearInterruptDisableFlag();
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0xE2):  // SEP
+        case (0xE2):  // SEP
         {
             uint8_t value = mSystemBus.readByte(getAddressOfOpCodeData(opCode));
             if (mCpuStatus.emulationFlag()) {
@@ -75,25 +75,25 @@ void Cpu65816::executeStatusReg(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 3);
             break;
         }
-        case(0x18):  // CLC
+        case (0x18):  // CLC
         {
             mCpuStatus.clearCarryFlag();
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0xD8):  // CLD
+        case (0xD8):  // CLD
         {
             mCpuStatus.clearDecimalFlag();
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0xB8):  // CLV
+        case (0xB8):  // CLV
         {
             mCpuStatus.clearOverflowFlag();
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0xFB):  // XCE
+        case (0xFB):  // XCE
         {
             bool oldCarry = mCpuStatus.carryFlag();
             bool oldEmulation = mCpuStatus.emulationFlag();
@@ -116,7 +116,7 @@ void Cpu65816::executeStatusReg(OpCode &opCode) {
             // New stack
             mStack = Stack(&mSystemBus);
 
-            addToProgramAddressAndCycles(1,2);
+            addToProgramAddressAndCycles(1, 2);
             break;
         }
         default: {

@@ -18,8 +18,8 @@
  */
 
 #include <cmath>
-#include "SystemBus.hpp"
-#include "Log.hpp"
+#include "SystemBus.h"
+#include "Log.h"
 
 #define LOG_TAG "SystemBus"
 
@@ -28,7 +28,7 @@ void SystemBus::registerDevice(SystemBusDevice *device) {
 }
 
 void SystemBus::storeByte(const Address &address, uint8_t value) {
-    for (SystemBusDevice *device : mDevices) {
+    for (SystemBusDevice *device: mDevices) {
         Address decodedAddress;
         if (device->decodeAddress(address, decodedAddress)) {
             device->storeByte(decodedAddress, value);
@@ -38,11 +38,11 @@ void SystemBus::storeByte(const Address &address, uint8_t value) {
 }
 
 void SystemBus::storeTwoBytes(const Address &address, uint16_t value) {
-    for (SystemBusDevice *device : mDevices) {
+    for (SystemBusDevice *device: mDevices) {
         Address decodedAddress;
         if (device->decodeAddress(address, decodedAddress)) {
-            uint8_t leastSignificantByte = (uint8_t)(value & 0xFF);
-            uint8_t mostSignificantByte = (uint8_t)((value & 0xFF00) >> 8);
+            uint8_t leastSignificantByte = (uint8_t) (value & 0xFF);
+            uint8_t mostSignificantByte = (uint8_t) ((value & 0xFF00) >> 8);
             device->storeByte(decodedAddress, leastSignificantByte);
             decodedAddress.incrementOffsetBy(1);
             device->storeByte(decodedAddress, mostSignificantByte);
@@ -52,7 +52,7 @@ void SystemBus::storeTwoBytes(const Address &address, uint16_t value) {
 }
 
 uint8_t SystemBus::readByte(const Address &address) {
-    for (SystemBusDevice *device : mDevices) {
+    for (SystemBusDevice *device: mDevices) {
         Address decodedAddress;
         if (device->decodeAddress(address, decodedAddress)) {
             return device->readByte(decodedAddress);
@@ -62,13 +62,13 @@ uint8_t SystemBus::readByte(const Address &address) {
 }
 
 uint16_t SystemBus::readTwoBytes(const Address &address) {
-    for (SystemBusDevice *device : mDevices) {
+    for (SystemBusDevice *device: mDevices) {
         Address decodedAddress;
         if (device->decodeAddress(address, decodedAddress)) {
             uint8_t leastSignificantByte = device->readByte(decodedAddress);
             decodedAddress.incrementOffsetBy(sizeof(uint8_t));
             uint8_t mostSignificantByte = device->readByte(decodedAddress);
-            uint16_t value = ((uint16_t)mostSignificantByte << 8) | leastSignificantByte;
+            uint16_t value = ((uint16_t) mostSignificantByte << 8) | leastSignificantByte;
             return value;
         }
     }
@@ -76,14 +76,14 @@ uint16_t SystemBus::readTwoBytes(const Address &address) {
 }
 
 Address SystemBus::readAddressAt(const Address &address) {
-    Address decodedAddress { 0x00, 0x0000 };
-    for (SystemBusDevice *device : mDevices) {
+    Address decodedAddress{0x00, 0x0000};
+    for (SystemBusDevice *device: mDevices) {
         if (device->decodeAddress(address, decodedAddress)) {
             // Read offset
             uint8_t leastSignificantByte = device->readByte(decodedAddress);
             decodedAddress.incrementOffsetBy(sizeof(uint8_t));
             uint8_t mostSignificantByte = device->readByte(decodedAddress);
-            uint16_t offset = ((uint16_t)mostSignificantByte << 8) | leastSignificantByte;
+            uint16_t offset = ((uint16_t) mostSignificantByte << 8) | leastSignificantByte;
             // Read bank
             decodedAddress.incrementOffsetBy(sizeof(uint8_t));
             uint8_t bank = device->readByte(decodedAddress);

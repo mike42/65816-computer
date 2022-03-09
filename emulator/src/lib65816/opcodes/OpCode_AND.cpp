@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #include <cmath>
 
@@ -162,8 +162,7 @@ void Cpu65816::executeAND(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 7);
             break;
         }
-        default:
-        {
+        default: {
             LOG_UNEXPECTED_OPCODE(opCode);
         }
     }

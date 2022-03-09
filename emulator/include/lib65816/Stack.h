@@ -21,27 +21,27 @@
 #define __STACK__
 
 #include <stdint.h>
-#include  "SystemBus.hpp"
+#include  "SystemBus.h"
 
 #define STACK_POINTER_DEFAULT 0x1FF
 
 class Stack {
-    public:
+public:
 
-        Stack(SystemBus *);
-        Stack(SystemBus *, uint16_t);
-        
-        void push8Bit(uint8_t);
-        void push16Bit(uint16_t);
-        
-        uint8_t pull8Bit();
-        uint16_t pull16Bit();
-        
-        uint16_t getStackPointer();
-        
-    private:
-        SystemBus *mSystemBus;
-        Address mStackAddress;
+    Stack(SystemBus *);
+    Stack(SystemBus *, uint16_t);
+
+    void push8Bit(uint8_t);
+    void push16Bit(uint16_t);
+
+    uint8_t pull8Bit();
+    uint16_t pull16Bit();
+
+    uint16_t getStackPointer();
+
+private:
+    SystemBus *mSystemBus;
+    Address mStackAddress;
 };
 
 #endif

@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeSTY"
 
@@ -35,13 +35,13 @@ void Cpu65816::executeSTY(OpCode &opCode) {
     }
 
     switch (opCode.getCode()) {
-        case(0x8C):  // STY Absolute
+        case (0x8C):  // STY Absolute
         {
             addToProgramAddress(3);
             addToCycles(4);
             break;
         }
-        case(0x84):  // STY Direct Page
+        case (0x84):  // STY Direct Page
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -51,7 +51,7 @@ void Cpu65816::executeSTY(OpCode &opCode) {
             addToCycles(3);
             break;
         }
-        case(0x94):  // STY Direct Page Indexed, X
+        case (0x94):  // STY Direct Page Indexed, X
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);

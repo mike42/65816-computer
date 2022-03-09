@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeStack"
 
@@ -39,7 +39,7 @@ void Cpu65816::executeStack(OpCode &opCode) {
             uint16_t operand = mSystemBus.readTwoBytes(opCodeDataAddress);
             mStack.push16Bit(operand);
             int opCycles = Binary::lower8BitsOf(mD) != 0 ? 1 : 0;
-            addToProgramAddressAndCycles(2, 6+opCycles);
+            addToProgramAddressAndCycles(2, 6 + opCycles);
             break;
         }
         case 0x62:                  // PER
@@ -51,7 +51,7 @@ void Cpu65816::executeStack(OpCode &opCode) {
             addToProgramAddressAndCycles(3, 6);
             break;
         }
-        case(0x48):                 // PHA
+        case (0x48):                 // PHA
         {
             if (accumulatorIs8BitWide()) {
                 mStack.push8Bit(Binary::lower8BitsOf(mA));
@@ -62,31 +62,31 @@ void Cpu65816::executeStack(OpCode &opCode) {
             }
             break;
         }
-        case(0x8B):                 // PHB
+        case (0x8B):                 // PHB
         {
             mStack.push8Bit(mDB);
             addToProgramAddressAndCycles(1, 3);
             break;
         }
-        case(0x0B):                 // PHD
+        case (0x0B):                 // PHD
         {
             mStack.push16Bit(mD);
             addToProgramAddressAndCycles(1, 4);
             break;
         }
-        case(0x4B):                 // PHK
+        case (0x4B):                 // PHK
         {
             mStack.push8Bit(mProgramAddress.getBank());
             addToProgramAddressAndCycles(1, 3);
             break;
         }
-        case(0x08):                 // PHP
+        case (0x08):                 // PHP
         {
             mStack.push8Bit(mCpuStatus.getRegisterValue());
             addToProgramAddressAndCycles(1, 3);
             break;
         }
-        case(0xDA):                 // PHX
+        case (0xDA):                 // PHX
         {
             if (indexIs8BitWide()) {
                 mStack.push8Bit(Binary::lower8BitsOf(mX));
@@ -97,7 +97,7 @@ void Cpu65816::executeStack(OpCode &opCode) {
             }
             break;
         }
-        case(0x5A):                 // PHY
+        case (0x5A):                 // PHY
         {
             if (indexIs8BitWide()) {
                 mStack.push8Bit(Binary::lower8BitsOf(mY));
@@ -108,7 +108,7 @@ void Cpu65816::executeStack(OpCode &opCode) {
             }
             break;
         }
-        case(0x68):                 // PLA
+        case (0x68):                 // PLA
         {
             if (accumulatorIs8BitWide()) {
                 Binary::setLower8BitsOf16BitsValue(&mA, mStack.pull8Bit());
@@ -121,27 +121,27 @@ void Cpu65816::executeStack(OpCode &opCode) {
             }
             break;
         }
-        case(0xAB):                 // PLB
+        case (0xAB):                 // PLB
         {
             mDB = mStack.pull8Bit();
             mCpuStatus.updateSignAndZeroFlagFrom8BitValue(mDB);
             addToProgramAddressAndCycles(1, 4);
             break;
         }
-        case(0x2B):                 // PLD
+        case (0x2B):                 // PLD
         {
             mD = mStack.pull16Bit();
             mCpuStatus.updateSignAndZeroFlagFrom16BitValue(mD);
             addToProgramAddressAndCycles(1, 5);
             break;
         }
-        case(0x28):                 // PLP
+        case (0x28):                 // PLP
         {
             mCpuStatus.setRegisterValue(mStack.pull8Bit());
             addToProgramAddressAndCycles(1, 4);
             break;
         }
-        case(0xFA):                 // PLX
+        case (0xFA):                 // PLX
         {
             if (indexIs8BitWide()) {
                 uint8_t value = mStack.pull8Bit();
@@ -155,7 +155,7 @@ void Cpu65816::executeStack(OpCode &opCode) {
             }
             break;
         }
-        case(0x7A):                 // PLY
+        case (0x7A):                 // PLY
         {
             if (indexIs8BitWide()) {
                 uint8_t value = mStack.pull8Bit();
@@ -169,8 +169,7 @@ void Cpu65816::executeStack(OpCode &opCode) {
             }
             break;
         }
-        default:
-        {
+        default: {
             LOG_UNEXPECTED_OPCODE(opCode);
         }
     }

@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Log.hpp"
+#include "Log.h"
 
 #define HEX_PREFIX "$"
 
@@ -29,22 +29,22 @@ Log Log::sErrorLog(true);
 Log::Log(const bool enabled) : mEnabled(enabled) {
 }
 
-Log& Log::dbg(const char *tag) {
+Log &Log::dbg(const char *tag) {
     sDebugLog.mTag = tag;
     return sDebugLog;
 }
 
-Log& Log::vrb(const char *tag) {
+Log &Log::vrb(const char *tag) {
     sVerboseLog.mTag = tag;
     return sVerboseLog;
 }
 
-Log& Log::trc(const char *tag) {
+Log &Log::trc(const char *tag) {
     sTraceLog.mTag = tag;
     return sTraceLog;
 }
 
-Log& Log::err(const char *tag) {
+Log &Log::err(const char *tag) {
     sErrorLog.mTag = tag;
     return sErrorLog;
 }

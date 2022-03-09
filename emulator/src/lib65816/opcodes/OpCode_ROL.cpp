@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeROL"
 
@@ -49,7 +49,7 @@
 void Cpu65816::executeMemoryROL(OpCode &opCode) {
     Address opCodeDataAddress = getAddressOfOpCodeData(opCode);
 
-    if(accumulatorIs8BitWide()) {
+    if (accumulatorIs8BitWide()) {
         uint8_t value = mSystemBus.readByte(opCodeDataAddress);
         DO_ROL_8_BIT(value);
         mSystemBus.storeByte(opCodeDataAddress, value);
@@ -61,7 +61,7 @@ void Cpu65816::executeMemoryROL(OpCode &opCode) {
 }
 
 void Cpu65816::executeAccumulatorROL(OpCode &opCode) {
-    if(accumulatorIs8BitWide()) {
+    if (accumulatorIs8BitWide()) {
         uint8_t value = Binary::lower8BitsOf(mA);
         DO_ROL_8_BIT(value);
         Binary::setLower8BitsOf16BitsValue(&mA, value);
@@ -95,9 +95,9 @@ void Cpu65816::executeROL(OpCode &opCode) {
             executeMemoryROL(opCode);
             int opCycles = Binary::lower8BitsOf(mD) != 0 ? 1 : 0;
             if (accumulatorIs8BitWide()) {
-                addToProgramAddressAndCycles(2, 5+opCycles);
+                addToProgramAddressAndCycles(2, 5 + opCycles);
             } else {
-                addToProgramAddressAndCycles(2, 7+opCycles);
+                addToProgramAddressAndCycles(2, 7 + opCycles);
             }
             break;
         }
@@ -110,9 +110,9 @@ void Cpu65816::executeROL(OpCode &opCode) {
             short opCycles = 0;
 #endif
             if (accumulatorIs8BitWide()) {
-                addToProgramAddressAndCycles(3, 7+opCycles);
+                addToProgramAddressAndCycles(3, 7 + opCycles);
             } else {
-                addToProgramAddressAndCycles(3, 9+opCycles);
+                addToProgramAddressAndCycles(3, 9 + opCycles);
             }
             break;
         }
@@ -121,14 +121,13 @@ void Cpu65816::executeROL(OpCode &opCode) {
             executeMemoryROL(opCode);
             int opCycles = Binary::lower8BitsOf(mD) != 0 ? 1 : 0;
             if (accumulatorIs8BitWide()) {
-                addToProgramAddressAndCycles(2, 6+opCycles);
+                addToProgramAddressAndCycles(2, 6 + opCycles);
             } else {
-                addToProgramAddressAndCycles(2, 8+opCycles);
+                addToProgramAddressAndCycles(2, 8 + opCycles);
             }
             break;
         }
-        default:
-        {
+        default: {
             LOG_UNEXPECTED_OPCODE(opCode);
         }
     }

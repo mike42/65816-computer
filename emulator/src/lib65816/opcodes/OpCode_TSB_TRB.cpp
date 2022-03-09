@@ -17,8 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Interrupt.hpp"
-#include "Cpu65816.hpp"
+#include "Interrupt.h"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeTSBTRB"
 
@@ -70,7 +70,7 @@ void Cpu65816::execute16BitTRB(OpCode &opCode) {
 
 void Cpu65816::executeTSBTRB(OpCode &opCode) {
     switch (opCode.getCode()) {
-        case(0x0C):                 // TSB Absolute
+        case (0x0C):                 // TSB Absolute
         {
             if (accumulatorIs8BitWide()) {
                 execute8BitTSB(opCode);
@@ -81,7 +81,7 @@ void Cpu65816::executeTSBTRB(OpCode &opCode) {
             addToProgramAddressAndCycles(3, 6);
             break;
         }
-        case(0x04):                 // TSB Direct Page
+        case (0x04):                 // TSB Direct Page
         {
             if (accumulatorIs8BitWide()) {
                 execute8BitTSB(opCode);
@@ -95,7 +95,7 @@ void Cpu65816::executeTSBTRB(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 5);
             break;
         }
-        case(0x1C):                 // TRB Absolute
+        case (0x1C):                 // TRB Absolute
         {
             if (accumulatorIs8BitWide()) {
                 execute8BitTRB(opCode);
@@ -106,7 +106,7 @@ void Cpu65816::executeTSBTRB(OpCode &opCode) {
             addToProgramAddressAndCycles(3, 6);
             break;
         }
-        case(0x14):                 // TRB Direct Page
+        case (0x14):                 // TRB Direct Page
         {
             if (accumulatorIs8BitWide()) {
                 execute8BitTRB(opCode);

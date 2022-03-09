@@ -2,7 +2,7 @@
 // Created by Francesco Rigoni on 05/03/2018.
 //
 
-#include "Ram.hpp"
+#include "Ram.h"
 
 Ram::Ram(uint8_t banks) {
     mRam = new uint8_t[banks * BANK_SIZE_BYTES];

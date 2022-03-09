@@ -1,24 +1,24 @@
-#include "Log.hpp"
-#include "Ram.hpp"
+#include "Log.h"
+#include "Ram.h"
 
-#include <Interrupt.hpp>
-#include <SystemBus.hpp>
-#include <Cpu65816.hpp>
-#include <Cpu65816Debugger.hpp>
+#include <Interrupt.h>
+#include <SystemBus.h>
+#include <Cpu65816.h>
+#include <Cpu65816Debugger.h>
 
 #define LOG_TAG "MAIN"
 
-NativeModeInterrupts nativeInterrupts {
+NativeModeInterrupts nativeInterrupts{
         .coProcessorEnable = 0x0000,
         .brk = 0x0000,
         .abort = 0x0000,
         .nonMaskableInterrupt = 0x0000,
         .reset = 0x0000,
         .interruptRequest = 0x0000,
-        
+
 };
 
-EmulationModeInterrupts emulationInterrupts {
+EmulationModeInterrupts emulationInterrupts{
         .coProcessorEnable = 0x0000,
         .unused = 0x0000,
         .abort = 0x0000,
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     debugger.doAfterStep([]() {});
 
     bool breakPointHit = false;
-    debugger.onBreakPoint([&breakPointHit]()  {
+    debugger.onBreakPoint([&breakPointHit]() {
         breakPointHit = true;
     });
 

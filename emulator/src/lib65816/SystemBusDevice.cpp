@@ -19,12 +19,12 @@
 
 #include <cmath>
 
-#include "SystemBusDevice.hpp"
+#include "SystemBusDevice.h"
 
 Address Address::sumOffsetToAddressNoWrapAround(const Address &address, uint16_t offset) {
     uint8_t newBank = address.getBank();
     uint16_t newOffset;
-    auto offsetSum = (uint32_t)(address.getOffset() + offset);
+    auto offsetSum = (uint32_t) (address.getOffset() + offset);
     if (offsetSum >= BANK_SIZE_BYTES) {
         ++newBank;
         newOffset = static_cast<uint16_t>(offsetSum - BANK_SIZE_BYTES);
@@ -51,15 +51,15 @@ bool Address::offsetsAreOnDifferentPages(uint16_t offsetFirst, uint16_t offsetSe
 }
 
 Address Address::newWithOffset(uint16_t offset) {
-    return sumOffsetToAddress((const Address &)*this, offset);
+    return sumOffsetToAddress((const Address &) *this, offset);
 }
 
 Address Address::newWithOffsetNoWrapAround(uint16_t offset) {
-    return sumOffsetToAddressNoWrapAround((const Address &)*this, offset);
+    return sumOffsetToAddressNoWrapAround((const Address &) *this, offset);
 }
 
 Address Address::newWithOffsetWrapAround(uint16_t offset) {
-    return sumOffsetToAddressWrapAround((const Address &)*this, offset);
+    return sumOffsetToAddressWrapAround((const Address &) *this, offset);
 }
 
 void Address::decrementOffsetBy(uint16_t offset) {

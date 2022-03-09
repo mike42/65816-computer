@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #include <cmath>
 
@@ -27,17 +27,19 @@
 #define LOG_TAG (mCpuStatus.emulationFlag() ? "Cpu6502" : "Cpu65816")
 #endif
 
-Cpu65816::Cpu65816(SystemBus &systemBus, EmulationModeInterrupts *emulationInterrupts, NativeModeInterrupts *nativeInterrupts) :
-            mSystemBus(systemBus),
-            mEmulationInterrupts(emulationInterrupts),
-            mNativeInterrupts(nativeInterrupts),
-            mStack(&mSystemBus) {
+Cpu65816::Cpu65816(SystemBus &systemBus, EmulationModeInterrupts *emulationInterrupts,
+                   NativeModeInterrupts *nativeInterrupts) :
+        mSystemBus(systemBus),
+        mEmulationInterrupts(emulationInterrupts),
+        mNativeInterrupts(nativeInterrupts),
+        mStack(&mSystemBus) {
 }
 
 
 void Cpu65816::setXL(uint8_t x) {
     mX = x;
 }
+
 void Cpu65816::setYL(uint8_t y) {
     mY = y;
 }
@@ -45,12 +47,15 @@ void Cpu65816::setYL(uint8_t y) {
 void Cpu65816::setX(uint16_t x) {
     mX = x;
 }
+
 void Cpu65816::setY(uint16_t y) {
     mY = y;
 }
+
 void Cpu65816::setA(uint16_t a) {
     mA = a;
 }
+
 uint16_t Cpu65816::getA() {
     return mA;
 }
@@ -108,17 +113,17 @@ bool Cpu65816::executeNextInstruction() {
         PB is loaded with $00 (65C816/65C802 only when operating in native mode).
         PC is loaded from the relevant vector (see tables).
         */
-        if (!mCpuStatus.emulationFlag())  {
+        if (!mCpuStatus.emulationFlag()) {
             mStack.push8Bit(mProgramAddress.getBank());
             mStack.push16Bit(mProgramAddress.getOffset());
             mStack.push8Bit(mCpuStatus.getRegisterValue());
             mCpuStatus.setInterruptDisableFlag();
-            mProgramAddress = Address(0x00,mSystemBus.readTwoBytes(Address(0x00,0xFFEE)));
+            mProgramAddress = Address(0x00, mSystemBus.readTwoBytes(Address(0x00, 0xFFEE)));
         } else {
             mStack.push16Bit(mProgramAddress.getOffset());
             mStack.push8Bit(mCpuStatus.getRegisterValue());
             mCpuStatus.setInterruptDisableFlag();
-            mProgramAddress = Address(0x00,mSystemBus.readTwoBytes(Address(0x00,0xFFFE)));
+            mProgramAddress = Address(0x00, mSystemBus.readTwoBytes(Address(0x00, 0xFFFE)));
         }
     }
 
@@ -132,7 +137,7 @@ bool Cpu65816::executeNextInstruction() {
 bool Cpu65816::accumulatorIs8BitWide() {
     // Accumulator is always 8 bit in emulation mode.
     if (mCpuStatus.emulationFlag()) return true;
-    // Accumulator width set to one means 8 bit accumulator.
+        // Accumulator width set to one means 8 bit accumulator.
     else return mCpuStatus.accumulatorWidthFlag();
 }
 
@@ -143,7 +148,7 @@ bool Cpu65816::accumulatorIs16BitWide() {
 bool Cpu65816::indexIs8BitWide() {
     // Index is always 8 bit in emulation mode.
     if (mCpuStatus.emulationFlag()) return true;
-    // Index width set to one means 8 bit accumulator.
+        // Index width set to one means 8 bit accumulator.
     else return mCpuStatus.indexWidthFlag();
 }
 

@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeTransfer"
 
@@ -28,10 +28,10 @@
 
 void Cpu65816::executeTransfer(OpCode &opCode) {
     switch (opCode.getCode()) {
-        case(0xA8):  // TAY
+        case (0xA8):  // TAY
         {
-            if ( (accumulatorIs8BitWide() && indexIs8BitWide()) ||
-                 (accumulatorIs16BitWide() && indexIs8BitWide()) ) {
+            if ((accumulatorIs8BitWide() && indexIs8BitWide()) ||
+                (accumulatorIs16BitWide() && indexIs8BitWide())) {
                 uint8_t lower8BitsOfA = Binary::lower8BitsOf(mA);
                 Binary::setLower8BitsOf16BitsValue(&mY, lower8BitsOfA);
                 mCpuStatus.updateSignAndZeroFlagFrom8BitValue(lower8BitsOfA);
@@ -39,13 +39,13 @@ void Cpu65816::executeTransfer(OpCode &opCode) {
                 mY = mA;
                 mCpuStatus.updateSignAndZeroFlagFrom16BitValue(mA);
             }
-            addToProgramAddressAndCycles(1,2);
+            addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0xAA):  // TAX
+        case (0xAA):  // TAX
         {
-            if ( (accumulatorIs8BitWide() && indexIs8BitWide()) ||
-                 (accumulatorIs16BitWide() && indexIs8BitWide()) ) {
+            if ((accumulatorIs8BitWide() && indexIs8BitWide()) ||
+                (accumulatorIs16BitWide() && indexIs8BitWide())) {
                 uint8_t lower8BitsOfA = Binary::lower8BitsOf(mA);
                 Binary::setLower8BitsOf16BitsValue(&mX, lower8BitsOfA);
                 mCpuStatus.updateSignAndZeroFlagFrom8BitValue(lower8BitsOfA);
@@ -53,24 +53,24 @@ void Cpu65816::executeTransfer(OpCode &opCode) {
                 mX = mA;
                 mCpuStatus.updateSignAndZeroFlagFrom16BitValue(mA);
             }
-            addToProgramAddressAndCycles(1,2);
+            addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0x5B):  // TCD
+        case (0x5B):  // TCD
         {
             mD = mA;
             mCpuStatus.updateSignAndZeroFlagFrom16BitValue(mD);
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0x7B):  // TDC
+        case (0x7B):  // TDC
         {
             mA = mD;
             mCpuStatus.updateSignAndZeroFlagFrom16BitValue(mA);
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0x1B):  // TCS
+        case (0x1B):  // TCS
         {
             uint16_t currentStackPointer = mStack.getStackPointer();
             if (mCpuStatus.emulationFlag()) {
@@ -83,14 +83,14 @@ void Cpu65816::executeTransfer(OpCode &opCode) {
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0x3B):  // TSC
+        case (0x3B):  // TSC
         {
             mA = mStack.getStackPointer();
             mCpuStatus.updateSignAndZeroFlagFrom16BitValue(mA);
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0xBA):  // TSX
+        case (0xBA):  // TSX
         {
             uint16_t stackPointer = mStack.getStackPointer();
             if (indexIs8BitWide()) {
@@ -105,7 +105,7 @@ void Cpu65816::executeTransfer(OpCode &opCode) {
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0x8A):  // TXA
+        case (0x8A):  // TXA
         {
             if (accumulatorIs8BitWide() && indexIs8BitWide()) {
                 uint8_t value = Binary::lower8BitsOf(mX);
@@ -127,7 +127,7 @@ void Cpu65816::executeTransfer(OpCode &opCode) {
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0x98):  // TYA
+        case (0x98):  // TYA
         {
             if (accumulatorIs8BitWide() && indexIs8BitWide()) {
                 uint8_t value = Binary::lower8BitsOf(mY);
@@ -149,7 +149,7 @@ void Cpu65816::executeTransfer(OpCode &opCode) {
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0x9A):  // TXS
+        case (0x9A):  // TXS
         {
             if (mCpuStatus.emulationFlag()) {
                 uint16_t newStackPointer = 0x100;
@@ -163,7 +163,7 @@ void Cpu65816::executeTransfer(OpCode &opCode) {
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0x9B):  // TXY
+        case (0x9B):  // TXY
         {
             if (indexIs8BitWide()) {
                 uint8_t value = Binary::lower8BitsOf(mX);
@@ -176,7 +176,7 @@ void Cpu65816::executeTransfer(OpCode &opCode) {
             addToProgramAddressAndCycles(1, 2);
             break;
         }
-        case(0xBB):  // TYX
+        case (0xBB):  // TYX
         {
             if (indexIs8BitWide()) {
                 uint8_t value = Binary::lower8BitsOf(mY);

@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #include <cmath>
 
@@ -70,7 +70,7 @@ void Cpu65816::executeORA(OpCode &opCode) {
             addToProgramAddressAndCycles(4, 5);
             break;
         }
-        case(0x05):                 // ORA Direct Page
+        case (0x05):                 // ORA Direct Page
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -78,7 +78,7 @@ void Cpu65816::executeORA(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 3);
             break;
         }
-        case(0x12):                 // ORA Direct Page Indirect
+        case (0x12):                 // ORA Direct Page Indirect
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -86,7 +86,7 @@ void Cpu65816::executeORA(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 5);
             break;
         }
-        case(0x07):                 // ORA Direct Page Indirect Long
+        case (0x07):                 // ORA Direct Page Indirect Long
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -94,7 +94,7 @@ void Cpu65816::executeORA(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 6);
             break;
         }
-        case(0x1D):                 // ORA Absolute Indexed, X
+        case (0x1D):                 // ORA Absolute Indexed, X
         {
             if (opCodeAddressingCrossesPageBoundary(opCode)) {
                 addToCycles(1);
@@ -102,12 +102,12 @@ void Cpu65816::executeORA(OpCode &opCode) {
             addToProgramAddressAndCycles(3, 4);
             break;
         }
-        case(0x1F):                 // ORA Absolute Long Indexed, X
+        case (0x1F):                 // ORA Absolute Long Indexed, X
         {
             addToProgramAddressAndCycles(4, 5);
             break;
         }
-        case(0x19):                 // ORA Absolute Indexed, Y
+        case (0x19):                 // ORA Absolute Indexed, Y
         {
             if (opCodeAddressingCrossesPageBoundary(opCode)) {
                 addToCycles(1);
@@ -115,7 +115,7 @@ void Cpu65816::executeORA(OpCode &opCode) {
             addToProgramAddressAndCycles(3, 4);
             break;
         }
-        case(0x15):                 // ORA Direct Page Indexed, X
+        case (0x15):                 // ORA Direct Page Indexed, X
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -131,7 +131,7 @@ void Cpu65816::executeORA(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 6);
             break;
         }
-        case(0x11):                 // ORA Direct Page Indirect Indexed, Y
+        case (0x11):                 // ORA Direct Page Indirect Indexed, Y
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -142,7 +142,7 @@ void Cpu65816::executeORA(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 5);
             break;
         }
-        case(0x17):                 // ORA Direct Page Indirect Long Indexed, Y
+        case (0x17):                 // ORA Direct Page Indirect Long Indexed, Y
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -150,18 +150,17 @@ void Cpu65816::executeORA(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 6);
             break;
         }
-        case(0x03):                // ORA Stack Relative
+        case (0x03):                // ORA Stack Relative
         {
             addToProgramAddressAndCycles(2, 4);
             break;
         }
-        case(0x13):                 // ORA Stack Relative Indirect Indexed, Y
+        case (0x13):                 // ORA Stack Relative Indirect Indexed, Y
         {
             addToProgramAddressAndCycles(2, 7);
             break;
         }
-        default:
-        {
+        default: {
             LOG_UNEXPECTED_OPCODE(opCode);
         }
     }

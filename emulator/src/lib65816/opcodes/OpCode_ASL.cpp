@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeASL"
 
@@ -44,7 +44,7 @@
 void Cpu65816::executeMemoryASL(OpCode &opCode) {
     Address opCodeDataAddress = getAddressOfOpCodeData(opCode);
 
-    if(accumulatorIs8BitWide()) {
+    if (accumulatorIs8BitWide()) {
         uint8_t value = mSystemBus.readByte(opCodeDataAddress);
         DO_ASL_8_BIT(value);
         mSystemBus.storeByte(opCodeDataAddress, value);
@@ -56,7 +56,7 @@ void Cpu65816::executeMemoryASL(OpCode &opCode) {
 }
 
 void Cpu65816::executeAccumulatorASL(OpCode &opCode) {
-    if(accumulatorIs8BitWide()) {
+    if (accumulatorIs8BitWide()) {
         uint8_t value = Binary::lower8BitsOf(mA);
         DO_ASL_8_BIT(value);
         Binary::setLower8BitsOf16BitsValue(&mA, value);
@@ -123,8 +123,7 @@ void Cpu65816::executeASL(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 6);
             break;
         }
-        default:
-        {
+        default: {
             LOG_UNEXPECTED_OPCODE(opCode);
         }
     }

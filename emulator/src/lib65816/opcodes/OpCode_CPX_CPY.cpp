@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeCPXCPY"
 
@@ -59,7 +59,7 @@ void Cpu65816::execute16BitCPY(OpCode &opCode) {
 
 void Cpu65816::executeCPXCPY(OpCode &opCode) {
     switch (opCode.getCode()) {
-        case(0xE0):  // CPX Immediate
+        case (0xE0):  // CPX Immediate
         {
             if (indexIs8BitWide()) {
                 execute8BitCPX(opCode);
@@ -71,7 +71,7 @@ void Cpu65816::executeCPXCPY(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 2);
             break;
         }
-        case(0xEC):  // CPX Absolute
+        case (0xEC):  // CPX Absolute
         {
             if (indexIs8BitWide()) {
                 execute8BitCPX(opCode);
@@ -82,7 +82,7 @@ void Cpu65816::executeCPXCPY(OpCode &opCode) {
             addToProgramAddressAndCycles(3, 4);
             break;
         }
-        case(0xE4):  // CPX Direct Page
+        case (0xE4):  // CPX Direct Page
         {
             if (indexIs8BitWide()) {
                 execute8BitCPX(opCode);
@@ -96,7 +96,7 @@ void Cpu65816::executeCPXCPY(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 3);
             break;
         }
-        case(0xC0):  // CPY Immediate
+        case (0xC0):  // CPY Immediate
         {
             if (indexIs8BitWide()) {
                 execute8BitCPY(opCode);
@@ -108,7 +108,7 @@ void Cpu65816::executeCPXCPY(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 2);
             break;
         }
-        case(0xCC):  // CPY Absolute
+        case (0xCC):  // CPY Absolute
         {
             if (indexIs8BitWide()) {
                 execute8BitCPY(opCode);
@@ -119,7 +119,7 @@ void Cpu65816::executeCPXCPY(OpCode &opCode) {
             addToProgramAddressAndCycles(3, 4);
             break;
         }
-        case(0xC4):  // CPY Direct Page
+        case (0xC4):  // CPY Direct Page
         {
             if (indexIs8BitWide()) {
                 execute8BitCPY(opCode);
@@ -133,8 +133,7 @@ void Cpu65816::executeCPXCPY(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 3);
             break;
         }
-        default:
-        {
+        default: {
             LOG_UNEXPECTED_OPCODE(opCode);
         }
     }

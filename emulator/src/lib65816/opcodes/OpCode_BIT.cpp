@@ -17,8 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Interrupt.hpp"
-#include "Cpu65816.hpp"
+#include "Interrupt.h"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeBIT"
 
@@ -65,7 +65,7 @@ void Cpu65816::executeBIT(OpCode &opCode) {
     }
 
     switch (opCode.getCode()) {
-        case(0x89):                 // BIT Immediate
+        case (0x89):                 // BIT Immediate
         {
             if (accumulatorIs16BitWide()) {
                 addToProgramAddress(1);
@@ -73,12 +73,12 @@ void Cpu65816::executeBIT(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 2);
             break;
         }
-        case(0x2C):                 // BIT Absolute
+        case (0x2C):                 // BIT Absolute
         {
             addToProgramAddressAndCycles(3, 4);
             break;
         }
-        case(0x24):                 // BIT Direct Page
+        case (0x24):                 // BIT Direct Page
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -86,7 +86,7 @@ void Cpu65816::executeBIT(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 3);
             break;
         }
-        case(0x3C):                 // BIT Absolute Indexed, X
+        case (0x3C):                 // BIT Absolute Indexed, X
         {
             if (opCodeAddressingCrossesPageBoundary(opCode)) {
                 addToCycles(1);
@@ -94,7 +94,7 @@ void Cpu65816::executeBIT(OpCode &opCode) {
             addToProgramAddressAndCycles(3, 4);
             break;
         }
-        case(0x34):                 // BIT Direct Page Indexed, X
+        case (0x34):                 // BIT Direct Page Indexed, X
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);

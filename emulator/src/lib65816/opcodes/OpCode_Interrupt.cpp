@@ -17,8 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Interrupt.hpp"
-#include "Cpu65816.hpp"
+#include "Interrupt.h"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeInterrupt"
 
@@ -29,7 +29,7 @@
 
 void Cpu65816::executeInterrupt(OpCode &opCode) {
     switch (opCode.getCode()) {
-        case(0x00):  // BRK
+        case (0x00):  // BRK
         {
             if (mCpuStatus.emulationFlag()) {
                 mStack.push16Bit(static_cast<uint16_t>(mProgramAddress.getOffset() + 2));
@@ -53,7 +53,7 @@ void Cpu65816::executeInterrupt(OpCode &opCode) {
             }
             break;
         }
-        case(0x02):                 // COP
+        case (0x02):                 // COP
         {
             if (mCpuStatus.emulationFlag()) {
                 mStack.push16Bit(static_cast<uint16_t>(mProgramAddress.getOffset() + 2));
@@ -72,7 +72,7 @@ void Cpu65816::executeInterrupt(OpCode &opCode) {
             mCpuStatus.clearDecimalFlag();
             break;
         }
-        case(0x40):                 // RTI
+        case (0x40):                 // RTI
         {
             // Note: The picture in the 65816 programming manual about this looks wrong.
             // This implementation follows the text instead.

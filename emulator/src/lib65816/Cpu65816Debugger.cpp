@@ -17,8 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816Debugger.hpp"
-#include "Cpu65816.hpp"
+#include "Cpu65816Debugger.h"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu65816Debugger"
 
@@ -28,7 +28,8 @@ Cpu65816Debugger::Cpu65816Debugger(Cpu65816 &cpu) : mCpu(cpu) {
     Log::dbg(LOG_TAG).str("Cpu is ready to run").show();
     Log::dbg(LOG_TAG).str("Emulation mode RST vector at").sp().hex(mCpu.mEmulationInterrupts->reset, 4).show();
     Log::dbg(LOG_TAG).str("Native mode BRK vector at").sp().hex(mCpu.mNativeInterrupts->brk, 4).show();
-    Log::dbg(LOG_TAG).str("Native mode VSYNC vector at").sp().hex(mCpu.mNativeInterrupts->nonMaskableInterrupt, 4).show();
+    Log::dbg(LOG_TAG).str("Native mode VSYNC vector at").sp().hex(mCpu.mNativeInterrupts->nonMaskableInterrupt,
+                                                                  4).show();
 }
 
 void Cpu65816Debugger::step() {
@@ -52,15 +53,15 @@ void Cpu65816Debugger::step() {
     }
 }
 
-void Cpu65816Debugger::doBeforeStep(const std::function<void ()> handler) {
+void Cpu65816Debugger::doBeforeStep(const std::function<void()> handler) {
     mOnBeforeStepHandler = handler;
 }
 
-void Cpu65816Debugger::doAfterStep(const std::function<void ()> handler) {
+void Cpu65816Debugger::doAfterStep(const std::function<void()> handler) {
     mOnAfterStepHandler = handler;
 }
 
-void Cpu65816Debugger::onBreakPoint(const std::function<void ()> handler) {
+void Cpu65816Debugger::onBreakPoint(const std::function<void()> handler) {
     mOnBreakPointHandler = handler;
 }
 
@@ -75,7 +76,8 @@ void Cpu65816Debugger::logStatusRegister() const {
 void Cpu65816Debugger::dumpCpu() const {
     Log::trc(LOG_TAG).str("====== CPU status start ======").show();
     Log::trc(LOG_TAG).str("A: ").hex(mCpu.mA, 4).sp().str("X: ").hex(mCpu.mX, 4).sp().str("Y: ").hex(mCpu.mY, 4).show();
-    Log::trc(LOG_TAG).str("PB: ").hex(mCpu.mProgramAddress.getBank(), 2).sp().str("PC: ").hex(mCpu.mProgramAddress.getOffset(), 4).show();
+    Log::trc(LOG_TAG).str("PB: ").hex(mCpu.mProgramAddress.getBank(), 2).sp().str("PC: ").hex(
+            mCpu.mProgramAddress.getOffset(), 4).show();
     Log::trc(LOG_TAG).str("DB: ").hex(mCpu.mDB, 2).sp().str("D: ").hex(mCpu.mD, 4).show();
     Log::trc(LOG_TAG).str("S (Stack pointer): ").hex(mCpu.mStack.getStackPointer(), 4).show();
     logStatusRegister();
@@ -89,7 +91,7 @@ void Cpu65816Debugger::logOpCode(OpCode &opCode) const {
     log.hex(mCpu.mProgramAddress.getBank(), 2).str(":").hex(mCpu.mProgramAddress.getOffset(), 4);
     log.str(" | ").hex(opCode.getCode(), 2).sp().str(opCode.getName()).sp();
 
-    switch(opCode.getAddressingMode()) {
+    switch (opCode.getAddressingMode()) {
         case AddressingMode::Interrupt:
         case AddressingMode::Accumulator:
         case AddressingMode::Implied:
@@ -107,8 +109,7 @@ void Cpu65816Debugger::logOpCode(OpCode &opCode) const {
             log.hex(mCpu.getAddressOfOpCodeData(opCode).getOffset(), 4).sp();
             log.str("                    [Absolute]");
             break;
-        case AddressingMode::AbsoluteLong:
-        {
+        case AddressingMode::AbsoluteLong: {
             Address opCodeDataAddress = mCpu.getAddressOfOpCodeData(opCode);
             log.hex(opCodeDataAddress.getBank(), 2).str(":").hex(opCodeDataAddress.getOffset(), 4).sp();
             log.str("                [Absolute Long]");
@@ -124,8 +125,7 @@ void Cpu65816Debugger::logOpCode(OpCode &opCode) const {
             log.hex(mCpu.mSystemBus.readTwoBytes(onePlusOpCodeAddress), 4).str(", X").sp();
             log.str("                 [Absolute Indexed, X]");
             break;
-        case AddressingMode::AbsoluteLongIndexedWithX:
-        {
+        case AddressingMode::AbsoluteLongIndexedWithX: {
             Address opCodeDataAddress = mCpu.getAddressOfOpCodeData(opCode);
             Address effectiveAddress = mCpu.mSystemBus.readAddressAt(opCodeDataAddress);
             log.hex(effectiveAddress.getBank(), 2).str(":").hex(effectiveAddress.getOffset(), 4).str(", X").sp();
@@ -157,11 +157,13 @@ void Cpu65816Debugger::logOpCode(OpCode &opCode) const {
             log.str("                    [Direct Page Indirect Long]");
             break;
         case AddressingMode::DirectPageIndexedIndirectWithX:
-            log.str("(").hex(mCpu.mSystemBus.readByte(Address(mCpu.mProgramAddress.getBank(),mCpu.mProgramAddress.getOffset()+1)), 2).str(", X)").sp();
+            log.str("(").hex(mCpu.mSystemBus.readByte(
+                    Address(mCpu.mProgramAddress.getBank(), mCpu.mProgramAddress.getOffset() + 1)), 2).str(", X)").sp();
             log.str("                    [Direct Page Indexed Indirect, X]");
             break;
         case AddressingMode::DirectPageIndirectIndexedWithY:
-            log.str("(").hex(mCpu.mSystemBus.readByte(Address(mCpu.mProgramAddress.getBank(),mCpu.mProgramAddress.getOffset()+1)), 2).str("), Y").sp();
+            log.str("(").hex(mCpu.mSystemBus.readByte(
+                    Address(mCpu.mProgramAddress.getBank(), mCpu.mProgramAddress.getOffset() + 1)), 2).str("), Y").sp();
             log.str("                    [Direct Page Indirect Indexed, Y]");
             break;
         case AddressingMode::DirectPageIndirectLongIndexedWithY:
@@ -182,7 +184,8 @@ void Cpu65816Debugger::logOpCode(OpCode &opCode) const {
         case AddressingMode::StackProgramCounterRelativeLong:
             break;
         case AddressingMode::StackRelativeIndirectIndexedWithY:
-            log.str("(").hex(mCpu.mSystemBus.readByte(Address::sumOffsetToAddressWrapAround(mCpu.mProgramAddress, 1)), 2);
+            log.str("(").hex(mCpu.mSystemBus.readByte(Address::sumOffsetToAddressWrapAround(mCpu.mProgramAddress, 1)),
+                             2);
             log.str(", S), Y").sp();
             log.str("                    [Absolute Indexed, X]");
             break;

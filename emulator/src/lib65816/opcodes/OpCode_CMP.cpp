@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeCMP"
 
@@ -48,6 +48,7 @@ void Cpu65816::execute16BitCMP(OpCode &opCode) {
         mCpuStatus.clearCarryFlag();
     }
 }
+
 void Cpu65816::executeCMP(OpCode &opCode) {
     if (accumulatorIs8BitWide()) {
         execute8BitCMP(opCode);
@@ -56,8 +57,8 @@ void Cpu65816::executeCMP(OpCode &opCode) {
         addToCycles(1);
     }
 
-    switch(opCode.getCode()) {
-        case(0xC9):  // CMP Immediate
+    switch (opCode.getCode()) {
+        case (0xC9):  // CMP Immediate
         {
             if (accumulatorIs16BitWide()) {
                 addToProgramAddress(1);
@@ -65,17 +66,17 @@ void Cpu65816::executeCMP(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 2);
             break;
         }
-        case(0xCD):  // CMP Absolute
+        case (0xCD):  // CMP Absolute
         {
             addToProgramAddressAndCycles(3, 4);
             break;
         }
-        case(0xCF):  // CMP Absolute Long
+        case (0xCF):  // CMP Absolute Long
         {
             addToProgramAddressAndCycles(4, 5);
             break;
         }
-        case(0xC5):  // CMP Direct Page
+        case (0xC5):  // CMP Direct Page
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -83,7 +84,7 @@ void Cpu65816::executeCMP(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 3);
             break;
         }
-        case(0xD2):  // CMP Direct Page Indirect
+        case (0xD2):  // CMP Direct Page Indirect
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -91,12 +92,12 @@ void Cpu65816::executeCMP(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 5);
             break;
         }
-        case(0xC7):  // CMP Direct Page Indirect Long
+        case (0xC7):  // CMP Direct Page Indirect Long
         {
             addToProgramAddressAndCycles(2, 6);
             break;
         }
-        case(0xDD):  // CMP Absolute Indexed, X
+        case (0xDD):  // CMP Absolute Indexed, X
         {
             if (opCodeAddressingCrossesPageBoundary(opCode)) {
                 addToCycles(1);
@@ -104,12 +105,12 @@ void Cpu65816::executeCMP(OpCode &opCode) {
             addToProgramAddressAndCycles(3, 4);
             break;
         }
-        case(0xDF):  // CMP Absolute Long Indexed, X
+        case (0xDF):  // CMP Absolute Long Indexed, X
         {
             addToProgramAddressAndCycles(4, 5);
             break;
         }
-        case(0xD9):  // CMP Absolute Indexed, Y
+        case (0xD9):  // CMP Absolute Indexed, Y
         {
             if (opCodeAddressingCrossesPageBoundary(opCode)) {
                 addToCycles(1);
@@ -117,7 +118,7 @@ void Cpu65816::executeCMP(OpCode &opCode) {
             addToProgramAddressAndCycles(3, 4);
             break;
         }
-        case(0xD5):  // CMP Direct Page Indexed, X
+        case (0xD5):  // CMP Direct Page Indexed, X
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -125,7 +126,7 @@ void Cpu65816::executeCMP(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 4);
             break;
         }
-        case(0xC1):  // CMP Direct Page Indexed Indirect, X
+        case (0xC1):  // CMP Direct Page Indexed Indirect, X
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -133,7 +134,7 @@ void Cpu65816::executeCMP(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 6);
             break;
         }
-        case(0xD1):  // CMP Direct Page Indexed Indirect, Y
+        case (0xD1):  // CMP Direct Page Indexed Indirect, Y
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -144,7 +145,7 @@ void Cpu65816::executeCMP(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 5);
             break;
         }
-        case(0xD7):  // CMP Direct Page Indirect Long Indexed, Y
+        case (0xD7):  // CMP Direct Page Indirect Long Indexed, Y
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -152,12 +153,12 @@ void Cpu65816::executeCMP(OpCode &opCode) {
             addToProgramAddressAndCycles(2, 6);
             break;
         }
-        case(0xC3):  // CMP Stack Relative
+        case (0xC3):  // CMP Stack Relative
         {
             addToProgramAddressAndCycles(2, 4);
             break;
         }
-        case(0xD3):  // CMP Stack Relative Indirect Indexed, Y
+        case (0xD3):  // CMP Stack Relative Indirect Indexed, Y
         {
             addToProgramAddressAndCycles(2, 7);
             break;

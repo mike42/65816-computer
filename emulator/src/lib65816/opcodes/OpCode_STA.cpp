@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeSTA"
 
@@ -36,19 +36,19 @@ void Cpu65816::executeSTA(OpCode &opCode) {
     }
 
     switch (opCode.getCode()) {
-        case(0x8D):  // STA Absolute
+        case (0x8D):  // STA Absolute
         {
             addToProgramAddress(3);
             addToCycles(4);
             break;
         }
-        case(0x8F):  // STA Absolute Long
+        case (0x8F):  // STA Absolute Long
         {
             addToProgramAddress(4);
             addToCycles(5);
             break;
         }
-        case(0x85):  // STA Direct Page
+        case (0x85):  // STA Direct Page
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -58,7 +58,7 @@ void Cpu65816::executeSTA(OpCode &opCode) {
             addToCycles(3);
             break;
         }
-        case(0x92):  // STA Direct Page Indirect
+        case (0x92):  // STA Direct Page Indirect
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -68,7 +68,7 @@ void Cpu65816::executeSTA(OpCode &opCode) {
             addToCycles(5);
             break;
         }
-        case(0x87):  // STA Direct Page Indirect Long
+        case (0x87):  // STA Direct Page Indirect Long
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -78,25 +78,25 @@ void Cpu65816::executeSTA(OpCode &opCode) {
             addToCycles(6);
             break;
         }
-        case(0x9D):  // STA Absolute Indexed, X
+        case (0x9D):  // STA Absolute Indexed, X
         {
             addToProgramAddress(3);
             addToCycles(5);
             break;
         }
-        case(0x9F):  // STA Absolute Long Indexed, X
+        case (0x9F):  // STA Absolute Long Indexed, X
         {
             addToProgramAddress(4);
             addToCycles(5);
             break;
         }
-        case(0x99):  // STA Absolute Indexed, Y
+        case (0x99):  // STA Absolute Indexed, Y
         {
             addToProgramAddress(3);
             addToCycles(5);
             break;
         }
-        case(0x95):  // STA Direct Page Indexed, X
+        case (0x95):  // STA Direct Page Indexed, X
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -106,7 +106,7 @@ void Cpu65816::executeSTA(OpCode &opCode) {
             addToCycles(4);
             break;
         }
-        case(0x81):  // STA Direct Page Indexed Indirect, X
+        case (0x81):  // STA Direct Page Indexed Indirect, X
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -116,7 +116,7 @@ void Cpu65816::executeSTA(OpCode &opCode) {
             addToCycles(6);
             break;
         }
-        case(0x91):  // STA Direct Page Indirect Indexed, Y
+        case (0x91):  // STA Direct Page Indirect Indexed, Y
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -126,7 +126,7 @@ void Cpu65816::executeSTA(OpCode &opCode) {
             addToCycles(6);
             break;
         }
-        case(0x97):  // STA Direct Page Indirect Long Indexed, Y
+        case (0x97):  // STA Direct Page Indirect Long Indexed, Y
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -136,13 +136,13 @@ void Cpu65816::executeSTA(OpCode &opCode) {
             addToCycles(6);
             break;
         }
-        case(0x83):  // STA Stack Relative
+        case (0x83):  // STA Stack Relative
         {
             addToProgramAddress(2);
             addToCycles(4);
             break;
         }
-        case(0x93):  // STA Stack Relative Indirect Indexed, Y
+        case (0x93):  // STA Stack Relative Indirect Indexed, Y
         {
             addToProgramAddress(2);
             addToCycles(7);

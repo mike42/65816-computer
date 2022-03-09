@@ -17,9 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CpuStatus.hpp"
-#include "Log.hpp"
-#include "Binary.hpp"
+#include "CpuStatus.h"
+#include "Log.h"
+#include "Binary.h"
 
 #define LOG_TAG "CpuStatus"
 
@@ -180,32 +180,32 @@ bool CpuStatus::overflowFlag() {
 
 uint8_t CpuStatus::getRegisterValue() {
     uint8_t value = 0;
-    if (carryFlag())                                    value |= STATUS_CARRY;
-    if (zeroFlag())                                     value |= STATUS_ZERO;
-    if (interruptDisableFlag())                         value |= STATUS_INTERRUPT_DISABLE;
-    if (decimalFlag())                                  value |= STATUS_DECIMAL;
-    if (emulationFlag() && breakFlag())                 value |= STATUS_BREAK;
-    if (!emulationFlag() && indexWidthFlag())           value |= STATUS_INDEX_WIDTH;
-    if (!emulationFlag() && accumulatorWidthFlag())     value |= STATUS_ACCUMULATOR_WIDTH;
-    if (overflowFlag())                                 value |= STATUS_OVERFLOW;
-    if (signFlag())                                     value |= STATUS_SIGN;
-    
+    if (carryFlag()) value |= STATUS_CARRY;
+    if (zeroFlag()) value |= STATUS_ZERO;
+    if (interruptDisableFlag()) value |= STATUS_INTERRUPT_DISABLE;
+    if (decimalFlag()) value |= STATUS_DECIMAL;
+    if (emulationFlag() && breakFlag()) value |= STATUS_BREAK;
+    if (!emulationFlag() && indexWidthFlag()) value |= STATUS_INDEX_WIDTH;
+    if (!emulationFlag() && accumulatorWidthFlag()) value |= STATUS_ACCUMULATOR_WIDTH;
+    if (overflowFlag()) value |= STATUS_OVERFLOW;
+    if (signFlag()) value |= STATUS_SIGN;
+
     return value;
 }
 
 void CpuStatus::setRegisterValue(uint8_t value) {
     if (value & STATUS_CARRY) setCarryFlag();
     else clearCarryFlag();
-    
+
     if (value & STATUS_ZERO) setZeroFlag();
     else clearZeroFlag();
-    
+
     if (value & STATUS_INTERRUPT_DISABLE) setInterruptDisableFlag();
     else clearInterruptDisableFlag();
-    
+
     if (value & STATUS_DECIMAL) setDecimalFlag();
     else clearDecimalFlag();
-    
+
     if (emulationFlag()) {
         if (value & STATUS_BREAK) setBreakFlag();
         else clearBreakFlag();
@@ -213,13 +213,13 @@ void CpuStatus::setRegisterValue(uint8_t value) {
         if (value & STATUS_INDEX_WIDTH) setIndexWidthFlag();
         else clearIndexWidthFlag();
     }
-    
+
     if (!emulationFlag() && (value & STATUS_ACCUMULATOR_WIDTH)) setAccumulatorWidthFlag();
     else clearAccumulatorWidthFlag();
-    
+
     if (value & STATUS_OVERFLOW) setOverflowFlag();
     else clearOverflowFlag();
-    
+
     if (value & STATUS_SIGN) setSignFlag();
     else clearSignFlag();
 }

@@ -23,20 +23,20 @@
 #include <stdint.h>
 #include <vector>
 
-#include "SystemBusDevice.hpp"
+#include "SystemBusDevice.h"
 
 class SystemBus {
-    public:
-        void registerDevice(SystemBusDevice *);
-        void storeByte(const Address&, uint8_t);
-        void storeTwoBytes(const Address&, uint16_t);
-        uint8_t readByte(const Address&);
-        uint16_t readTwoBytes(const Address&);
-        Address readAddressAt(const Address&);
+public:
+    void registerDevice(SystemBusDevice *);
+    void storeByte(const Address &, uint8_t);
+    void storeTwoBytes(const Address &, uint16_t);
+    uint8_t readByte(const Address &);
+    uint16_t readTwoBytes(const Address &);
+    Address readAddressAt(const Address &);
 
-    private:
+private:
 
-        std::vector<SystemBusDevice *> mDevices;
+    std::vector<SystemBusDevice *> mDevices;
 };
 
 #endif

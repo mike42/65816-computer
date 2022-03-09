@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeSTZ"
 
@@ -35,13 +35,13 @@ void Cpu65816::executeSTZ(OpCode &opCode) {
     }
 
     switch (opCode.getCode()) {
-        case(0x9C):  // STZ Absolute
+        case (0x9C):  // STZ Absolute
         {
             addToProgramAddress(3);
             addToCycles(4);
             break;
         }
-        case(0x64):  // STZ Direct Page
+        case (0x64):  // STZ Direct Page
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -51,13 +51,13 @@ void Cpu65816::executeSTZ(OpCode &opCode) {
             addToCycles(3);
             break;
         }
-        case(0x9E):  // STZ Absolute Indexed, X
+        case (0x9E):  // STZ Absolute Indexed, X
         {
             addToProgramAddress(3);
             addToCycles(5);
             break;
         }
-        case(0x74):  // STZ Direct Page Indexed, X
+        case (0x74):  // STZ Direct Page Indexed, X
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);

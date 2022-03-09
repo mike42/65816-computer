@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cpu65816.hpp"
+#include "Cpu65816.h"
 
 #define LOG_TAG "Cpu::executeSBC"
 
@@ -135,7 +135,7 @@ void Cpu65816::executeSBC(OpCode &opCode) {
 #endif
 
     switch (opCode.getCode()) {
-        case(0xE9):                 // SBC Immediate
+        case (0xE9):                 // SBC Immediate
         {
             if (accumulatorIs16BitWide()) {
                 addToProgramAddress(1);
@@ -144,19 +144,19 @@ void Cpu65816::executeSBC(OpCode &opCode) {
             addToCycles(2);
             break;
         }
-        case(0xED):                 // SBC Absolute
+        case (0xED):                 // SBC Absolute
         {
             addToProgramAddress(3);
             addToCycles(4);
             break;
         }
-        case(0xEF):                 // SBC Absolute Long
+        case (0xEF):                 // SBC Absolute Long
         {
             addToProgramAddress(4);
             addToCycles(5);
             break;
         }
-        case(0xE5):                 // SBC Direct Page
+        case (0xE5):                 // SBC Direct Page
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -166,7 +166,7 @@ void Cpu65816::executeSBC(OpCode &opCode) {
             addToCycles(3);
             break;
         }
-        case(0xF2):                 // SBC Direct Page Indirect
+        case (0xF2):                 // SBC Direct Page Indirect
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -176,7 +176,7 @@ void Cpu65816::executeSBC(OpCode &opCode) {
             addToCycles(5);
             break;
         }
-        case(0xE7):                 // SBC Direct Page Indirect Long
+        case (0xE7):                 // SBC Direct Page Indirect Long
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -186,7 +186,7 @@ void Cpu65816::executeSBC(OpCode &opCode) {
             addToCycles(6);
             break;
         }
-        case(0xFD):                 // SBC Absolute Indexed, X
+        case (0xFD):                 // SBC Absolute Indexed, X
         {
             if (opCodeAddressingCrossesPageBoundary(opCode)) {
                 addToCycles(1);
@@ -196,13 +196,13 @@ void Cpu65816::executeSBC(OpCode &opCode) {
             addToCycles(4);
             break;
         }
-        case(0xFF):                 // SBC Absolute Long Indexed, X
+        case (0xFF):                 // SBC Absolute Long Indexed, X
         {
             addToProgramAddress(4);
             addToCycles(5);
             break;
         }
-        case(0xF9):                 // SBC Absolute Indexed Y
+        case (0xF9):                 // SBC Absolute Indexed Y
         {
             if (opCodeAddressingCrossesPageBoundary(opCode)) {
                 addToCycles(1);
@@ -211,7 +211,7 @@ void Cpu65816::executeSBC(OpCode &opCode) {
             addToCycles(4);
             break;
         }
-        case(0xF5):                 // SBC Direct Page Indexed, X
+        case (0xF5):                 // SBC Direct Page Indexed, X
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -223,7 +223,7 @@ void Cpu65816::executeSBC(OpCode &opCode) {
             addToCycles(4);
             break;
         }
-        case(0xE1):                 // SBC Direct Page Indexed Indirect, X
+        case (0xE1):                 // SBC Direct Page Indexed Indirect, X
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -232,7 +232,7 @@ void Cpu65816::executeSBC(OpCode &opCode) {
             addToCycles(6);
             break;
         }
-        case(0xF1):                 // SBC Direct Page Indirect Indexed, Y
+        case (0xF1):                 // SBC Direct Page Indirect Indexed, Y
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -244,7 +244,7 @@ void Cpu65816::executeSBC(OpCode &opCode) {
             addToCycles(5);
             break;
         }
-        case(0xF7):                 // SBC Direct Page Indirect Long Indexed, Y
+        case (0xF7):                 // SBC Direct Page Indirect Long Indexed, Y
         {
             if (Binary::lower8BitsOf(mD) != 0) {
                 addToCycles(1);
@@ -253,13 +253,13 @@ void Cpu65816::executeSBC(OpCode &opCode) {
             addToCycles(6);
             break;
         }
-        case(0xE3):                 // SBC Stack Relative
+        case (0xE3):                 // SBC Stack Relative
         {
             addToProgramAddress(2);
             addToCycles(4);
             break;
         }
-        case(0xF3):                 // SBC Stack Relative Indirect Indexed, Y
+        case (0xF3):                 // SBC Stack Relative Indirect Indexed, Y
         {
             addToProgramAddress(2);
             addToCycles(7);
