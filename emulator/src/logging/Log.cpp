@@ -81,7 +81,7 @@ Log &Log::sp() {
 
 void Log::show() {
     if (mEnabled) {
-        std::cout << mTag << ": " << mStream.str() << std::endl;
+        std::cerr << mTag << ": " << mStream.str() << std::endl;
         mStream.str("");
         mStream.clear();
     }
