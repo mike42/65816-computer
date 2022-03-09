@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SYSTEMBUS__
-#define __SYSTEMBUS__
+#ifndef EMULATOR_SYSTEMBUS_H
+#define EMULATOR_SYSTEMBUS_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 
 #include "SystemBusDevice.h"
@@ -39,4 +39,4 @@ private:
     std::vector<SystemBusDevice *> mDevices;
 };
 
-#endif
+#endif // EMULATOR_SYSTEMBUS_H

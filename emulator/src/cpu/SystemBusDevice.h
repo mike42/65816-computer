@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SYSBUS_DEVICE_H
-#define SYSBUS_DEVICE_H
+#ifndef EMULATOR_SYSTEM_BUS_DEVICE_H
+#define EMULATOR_SYSTEM_BUS_DEVICE_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #define BANK_SIZE_BYTES                0x10000
 #define HALF_BANK_SIZE_BYTES            0x8000
@@ -87,4 +87,4 @@ public:
     virtual bool decodeAddress(const Address &, Address &) = 0;
 };
 
-#endif // SYSBUS_DEVICE_H
+#endif // EMULATOR_SYSTEM_BUS_DEVICE_H

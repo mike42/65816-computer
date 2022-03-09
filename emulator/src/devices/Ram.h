@@ -1,9 +1,5 @@
-//
-// Created by Francesco Rigoni on 05/03/2018.
-//
-
-#ifndef LIB65816_SAMPLE_PROGRAMRAM_H
-#define LIB65816_SAMPLE_PROGRAMRAM_H
+#ifndef EMULATOR_RAM_H
+#define EMULATOR_RAM_H
 
 #include <SystemBusDevice.h>
 
@@ -22,4 +18,4 @@ public:
 };
 
 
-#endif //LIB65816_SAMPLE_PROGRAMRAM_H
+#endif //EMULATOR_RAM_H

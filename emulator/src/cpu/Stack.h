@@ -17,11 +17,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __STACK__
-#define __STACK__
+#ifndef EMULATOR_STACK_H
+#define EMULATOR_STACK_H
 
-#include <stdint.h>
-#include  "SystemBus.h"
+#include <cstdint>
+#include "SystemBus.h"
 
 #define STACK_POINTER_DEFAULT 0x1FF
 
@@ -44,4 +44,4 @@ private:
     Address mStackAddress;
 };
 
-#endif
+#endif // EMULATOR_STACK_H

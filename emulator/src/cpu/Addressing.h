@@ -17,8 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ADDRESSING_HPP
-#define ADDRESSING_HPP
+#ifndef EMULATOR_ADDRESSING_H
+#define EMULATOR_ADDRESSING_H
 
 enum class AddressingMode {
     Interrupt,
@@ -52,4 +52,4 @@ enum class AddressingMode {
     ProgramCounterRelativeLong
 };
 
-#endif // ADDRESSING_HPP
+#endif // EMULATOR_ADDRESSING_H

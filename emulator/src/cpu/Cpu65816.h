@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CPU_65816__
-#define __CPU_65816__
+#ifndef EMULATOR_CPU65816_H
+#define EMULATOR_CPU65816_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "SystemBus.h"
 #include "Interrupt.h"
@@ -206,4 +206,4 @@ private:
     void reset();
 };
 
-#endif
+#endif // EMULATOR_CPU65816_H

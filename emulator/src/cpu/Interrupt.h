@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INTERRUPT_HPP
-#define INTERRUPT_HPP
+#ifndef EMULATOR_INTERRUPT_H
+#define EMULATOR_INTERRUPT_H
 
-#include <stdint.h>
+#include <cstdint>
 
 // Interrupt table. Native mode.
 typedef struct {
@@ -42,4 +42,4 @@ typedef struct {
     const uint16_t brkIrq;
 } EmulationModeInterrupts;
 
-#endif // INTERRUPT_HPP
+#endif // EMULATOR_INTERRUPT_H

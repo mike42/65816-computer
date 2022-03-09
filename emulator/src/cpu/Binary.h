@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
+#include <cstdint>
 
-#ifndef __UTILS__
-#define __UTILS__
+#ifndef EMULATOR_BINARY_H
+#define EMULATOR_BINARY_H
 
 namespace Binary {
     uint8_t lower8BitsOf(uint16_t);
@@ -44,4 +44,4 @@ namespace Binary {
     bool bcdSubtract16Bit(uint16_t, uint16_t, uint16_t *, bool);
 }
 
-#endif
+#endif // EMULATOR_BINARY_H

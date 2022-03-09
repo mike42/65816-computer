@@ -19,8 +19,6 @@
 
 #include "Cpu65816.h"
 
-#include <cmath>
-
 #ifdef EMU_65C02
 #define LOG_TAG "Cpu65C02"
 #else

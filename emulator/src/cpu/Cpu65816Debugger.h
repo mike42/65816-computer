@@ -17,8 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CPU65816DEBUGGER_H
-#define CPU65816DEBUGGER_H
+#ifndef EMULATOR_CPU65816DEBUGGER_H
+#define EMULATOR_CPU65816DEBUGGER_H
 
 #include <cstdint>
 #include <functional>
@@ -53,4 +53,4 @@ private:
     Cpu65816 &mCpu;
 };
 
-#endif // CPU65816DEBUGGER_H
+#endif // EMULATOR_CPU65816DEBUGGER_H

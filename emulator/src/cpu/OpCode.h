@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef OPCODE_HPP
-#define OPCODE_HPP
+#ifndef EMULATOR_OPCODE_H
+#define EMULATOR_OPCODE_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "Addressing.h"
 
@@ -65,4 +65,4 @@ public:
     }
 };
 
-#endif // OPCODE_HPP
+#endif // EMULATOR_OPCODE_H

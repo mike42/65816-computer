@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CPUSTATUS_H
-#define CPUSTATUS_H
+#ifndef EMULATOR_CPUSTATUS_H
+#define EMULATOR_CPUSTATUS_H
 
-#include <stdint.h>
+#include <cstdint>
 
 class CpuStatus {
 public:
@@ -89,4 +89,4 @@ private:
     bool mBreakFlag = false;
 };
 
-#endif // CPUSTATUS_H
+#endif // EMULATOR_CPUSTATUS_H

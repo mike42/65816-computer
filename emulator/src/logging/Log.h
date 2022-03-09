@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LOG__
-#define __LOG__
+#ifndef EMULATOR_LOG_H
+#define EMULATOR_LOG_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -57,5 +57,5 @@ public:
     void show();
 };
 
-#endif
+#endif // EMULATOR_LOG_H
 
