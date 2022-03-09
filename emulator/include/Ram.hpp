@@ -5,7 +5,7 @@
 #ifndef LIB65816_SAMPLE_PROGRAMRAM_H
 #define LIB65816_SAMPLE_PROGRAMRAM_H
 
-#include <lib65816/include/SystemBusDevice.hpp>
+#include <SystemBusDevice.hpp>
 
 class Ram : public SystemBusDevice {
 private:

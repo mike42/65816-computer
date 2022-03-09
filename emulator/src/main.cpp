@@ -1,11 +1,10 @@
-
 #include "Log.hpp"
 #include "Ram.hpp"
 
-#include <lib65816/include/Interrupt.hpp>
-#include <lib65816/include/SystemBus.hpp>
-#include <lib65816/include/Cpu65816.hpp>
-#include <lib65816/include/Cpu65816Debugger.hpp>
+#include <Interrupt.hpp>
+#include <SystemBus.hpp>
+#include <Cpu65816.hpp>
+#include <Cpu65816Debugger.hpp>
 
 #define LOG_TAG "MAIN"
 
