@@ -6,27 +6,9 @@
 #include <SystemBus.h>
 #include <Cpu65816.h>
 #include <Cpu65816Debugger.h>
+#include <endian.h>
 
 #define LOG_TAG "MAIN"
-
-NativeModeInterrupts nativeInterrupts{
-        .coProcessorEnable = 0x0000,
-        .brk = 0x0000,
-        .abort = 0x0000,
-        .nonMaskableInterrupt = 0x0000,
-        .reset = 0x0000,
-        .interruptRequest = 0x0000,
-
-};
-
-EmulationModeInterrupts emulationInterrupts{
-        .coProcessorEnable = 0x0000,
-        .unused = 0x0000,
-        .abort = 0x0000,
-        .nonMaskableInterrupt = 0x0000,
-        .reset = 0x0000,
-        .brkIrq = 0x0000
-};
 
 int main(int argc, char **argv) {
     Log::vrb(LOG_TAG).str("+++ Lib65816 Sample Programs +++").show();
@@ -44,6 +26,8 @@ int main(int argc, char **argv) {
     systemBus.registerDevice(&rom);
     systemBus.registerDevice(&ram);
 
+    EmulationModeInterrupts emulationInterrupts = rom.getEmulationModeInterrupts();
+    NativeModeInterrupts nativeInterrupts = rom.getNativeModeInterrupts();
     Cpu65816 cpu(systemBus, &emulationInterrupts, &nativeInterrupts);
     Cpu65816Debugger debugger(cpu);
     debugger.setBreakPoint(Address(0x00, 0x0005));
