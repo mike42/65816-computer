@@ -18,8 +18,8 @@ RAM0 = /A19*A18 + /A19*A17 + /A19*A16 + /A19*/A15 + /A19*/A14
 ; RAM1 is selected for any address that matches 1xxx xxxxxxxx xxxxxxxx
 RAM1 = A19
 
-; Qualify writes with clock
-RD = RW
+; Qualify reads/writes with clock
+RD = Clock*RW
 WR = Clock*/RW
 
 DESCRIPTION
