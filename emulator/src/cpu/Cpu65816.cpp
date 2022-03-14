@@ -156,6 +156,7 @@ bool Cpu65816::indexIs16BitWide() {
 
 void Cpu65816::addToCycles(int cycles) {
     mTotalCyclesCounter += cycles;
+    mSystemBus.clockTick(cycles);
 }
 
 void Cpu65816::subtractFromCycles(int cycles) {

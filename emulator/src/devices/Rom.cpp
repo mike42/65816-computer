@@ -1,4 +1,3 @@
-#include <iostream>
 #include <cassert>
 #include "Rom.h"
 
@@ -36,23 +35,23 @@ uint16_t Rom::vector_at(uint16_t offset) {
 
 NativeModeInterrupts Rom::getNativeModeInterrupts() {
     return {
-            .coProcessorEnable = 0x0000,
-            .brk = 0x0000,
-            .abort = 0x0000,
-            .nonMaskableInterrupt = 0x0000,
-            .reset = 0x0000,
-            .interruptRequest = 0x0000,
+            .coProcessorEnable = this->vector_at(0xFFE4),
+            .brk = this->vector_at(0xFFE6),
+            .abort = this->vector_at(0xFFE8),
+            .nonMaskableInterrupt = this->vector_at(0xFFEA),
+            .reset = this->vector_at(0xFFEC),
+            .interruptRequest = this->vector_at(0xFFEE)
 
     };
 }
 
 EmulationModeInterrupts Rom::getEmulationModeInterrupts() {
     return {
-            .coProcessorEnable = 0x0000,
-            .unused = 0x0000,
-            .abort = 0x0000,
-            .nonMaskableInterrupt = 0x0000,
+            .coProcessorEnable = this->vector_at(0xFFF4),
+            .unused = this->vector_at(0xFFF6),
+            .abort = this->vector_at(0xFFF8),
+            .nonMaskableInterrupt = this->vector_at(0xFFFA),
             .reset = this->vector_at(0xFFFC),
-            .brkIrq = 0x0000
+            .brkIrq = this->vector_at(0xFFFE),
     };
 }

@@ -69,3 +69,7 @@ void Address::decrementOffsetBy(uint16_t offset) {
 void Address::incrementOffsetBy(uint16_t offset) {
     mOffset += offset;
 }
+
+void SystemBusDevice::clockTick(int i) {
+    // Do nothing
+}

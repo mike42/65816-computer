@@ -84,6 +84,11 @@ public:
       Returns true if the address was decoded successfully by this device.
      */
     virtual bool decodeAddress(const Address &, Address &) = 0;
+
+    /**
+     * Called once per clock cycle
+     */
+    virtual void clockTick(int i);
 };
 
 #endif // EMULATOR_SYSTEM_BUS_DEVICE_H

@@ -33,6 +33,7 @@ public:
     uint8_t readByte(const Address &);
     uint16_t readTwoBytes(const Address &);
     Address readAddressAt(const Address &);
+    void clockTick(int i);
 
 private:
 

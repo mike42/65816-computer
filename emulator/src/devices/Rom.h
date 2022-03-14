@@ -6,7 +6,9 @@
 #include "Interrupt.h"
 
 #define ROM_SIZE 8192
-
+/**
+ * Emulate ROM, backed by a file
+ */
 class Rom : public SystemBusDevice {
 private:
     uint8_t rom[ROM_SIZE];

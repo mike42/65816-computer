@@ -92,3 +92,9 @@ Address SystemBus::readAddressAt(const Address &address) {
     }
     return decodedAddress;
 }
+
+void SystemBus::clockTick(int cycles) {
+    for (SystemBusDevice *device: mDevices) {
+        device->clockTick(cycles);
+    }
+}

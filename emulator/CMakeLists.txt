@@ -46,7 +46,8 @@ add_executable(emulator
         src/logging/Log.cpp
         src/main.cpp
         src/devices/Ram.cpp
-        src/devices/Rom.cpp)
+        src/devices/Rom.cpp
+        src/devices/Via.cpp)
 
 target_include_directories(emulator PRIVATE
         src/
