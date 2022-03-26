@@ -21,10 +21,10 @@
 
 #define HEX_PREFIX "$"
 
-Log Log::sVerboseLog(true);
-Log Log::sDebugLog(true);
-Log Log::sTraceLog(true);
-Log Log::sErrorLog(true);
+Log Log::sVerboseLog(false);
+Log Log::sDebugLog(false);
+Log Log::sTraceLog(false);
+Log Log::sErrorLog(false);
 
 Log::Log(const bool enabled) : mEnabled(enabled) {
 }

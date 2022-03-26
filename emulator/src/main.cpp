@@ -3,7 +3,6 @@
 #include "Rom.h"
 #include "Via.h"
 
-#include <Interrupt.h>
 #include <SystemBus.h>
 #include <Cpu65816.h>
 #include <Cpu65816Debugger.h>
