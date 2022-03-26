@@ -21,6 +21,7 @@
 #define EMULATOR_CPU65816_H
 
 #include <cstdint>
+#include <memory>
 
 #include "SystemBus.h"
 #include "Interrupt.h"
@@ -31,6 +32,7 @@
 #include "Log.h"
 #include "Binary.h"
 #include "BuildConfig.h"
+#include "InterruptStatus.h"
 
 // Macro used by OpCode methods when an unrecognized OpCode is being executed.
 #define LOG_UNEXPECTED_OPCODE(opCode) Log::err(LOG_TAG).str("Unexpected OpCode: ").str(opCode.getName()).show();
@@ -41,14 +43,10 @@ class Cpu65816 {
     friend class Cpu65816Debugger;
 
 public:
-    Cpu65816(SystemBus &, EmulationModeInterrupts *, NativeModeInterrupts *);
+    Cpu65816(SystemBus &, std::shared_ptr<InterruptStatus> nmi, std::shared_ptr<InterruptStatus> irq);
 
     void setRESPin(bool);
     void setRDYPin(bool);
-
-    void setIRQPin(bool value) { mPins.IRQ = value; }
-
-    void setNMIPin(bool value) { mPins.NMI = value; }
 
     void setABORTPin(bool value) { mPins.ABORT = value; }
 
@@ -68,8 +66,6 @@ public:
 
 private:
     SystemBus &mSystemBus;
-    EmulationModeInterrupts *mEmulationInterrupts;
-    NativeModeInterrupts *mNativeInterrupts;
 
     // Accumulator register
     uint16_t mA = 0;
@@ -90,10 +86,9 @@ private:
         // Ready to false means CPU is waiting for an NMI/IRQ/ABORT/RESET
         bool RDY = false;
 
-        // nmi true execute nmi vector (0x00FFEA)
+        // Previous value of NMI, used for edge detect
         bool NMI = false;
-        // irq true exucute irq vector (0x00FFEE)
-        bool IRQ = false;
+
         // abort true execute abort vector (0x00FFE8)
         bool ABORT = false;
 
@@ -204,6 +199,9 @@ private:
     void executeMisc(OpCode &);
 
     void reset();
+
+    std::shared_ptr<InterruptStatus> nmi;
+    std::shared_ptr<InterruptStatus> irq;
 };
 
 #endif // EMULATOR_CPU65816_H

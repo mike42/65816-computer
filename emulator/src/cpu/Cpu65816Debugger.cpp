@@ -26,10 +26,6 @@ Cpu65816Debugger::Cpu65816Debugger(Cpu65816 &cpu) : mCpu(cpu) {
     cpu.setRESPin(false);
 
     Log::dbg(LOG_TAG).str("Cpu is ready to run").show();
-    Log::dbg(LOG_TAG).str("Emulation mode RST vector at").sp().hex(mCpu.mEmulationInterrupts->reset, 4).show();
-    Log::dbg(LOG_TAG).str("Native mode BRK vector at").sp().hex(mCpu.mNativeInterrupts->brk, 4).show();
-    Log::dbg(LOG_TAG).str("Native mode VSYNC vector at").sp().hex(mCpu.mNativeInterrupts->nonMaskableInterrupt,
-                                                                  4).show();
 }
 
 void Cpu65816Debugger::step() {

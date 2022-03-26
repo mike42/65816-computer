@@ -19,18 +19,20 @@
 
 #include "Cpu65816.h"
 
+#include <utility>
+
 #ifdef EMU_65C02
 #define LOG_TAG "Cpu65C02"
 #else
 #define LOG_TAG (mCpuStatus.emulationFlag() ? "Cpu6502" : "Cpu65816")
 #endif
 
-Cpu65816::Cpu65816(SystemBus &systemBus, EmulationModeInterrupts *emulationInterrupts,
-                   NativeModeInterrupts *nativeInterrupts) :
+Cpu65816::Cpu65816(SystemBus &systemBus, std::shared_ptr<InterruptStatus> nmi, std::shared_ptr<InterruptStatus> irq) :
         mSystemBus(systemBus),
-        mEmulationInterrupts(emulationInterrupts),
-        mNativeInterrupts(nativeInterrupts),
-        mStack(&mSystemBus) {
+        mStack(&mSystemBus),
+        nmi(nmi),
+        irq(irq) {
+    mPins.NMI = nmi->get();
 }
 
 
@@ -83,7 +85,7 @@ void Cpu65816::reset() {
     mY &= 0xFF;
     mD = 0x0;
     mStack = Stack(&mSystemBus);
-    mProgramAddress = Address(0x00, mEmulationInterrupts->reset);
+    mProgramAddress = Address(0x00, mSystemBus.readTwoBytes(Address(0x00, INTERRUPT_VECTOR_EMULATION_RESET)));
 }
 
 void Cpu65816::setRESPin(bool value) {
@@ -101,7 +103,7 @@ bool Cpu65816::executeNextInstruction() {
     if (mPins.RES) {
         return false;
     }
-    if ((mPins.IRQ) && (!mCpuStatus.interruptDisableFlag())) {
+    if ((irq->get()) && (!mCpuStatus.interruptDisableFlag())) {
         /*
         The program bank register (PB, the A16-A23 part of the address bus) is pushed onto the hardware stack (65C816/65C802 only when operating in native mode).
         The most significant byte (MSB) of the program counter (PC) is pushed onto the stack.
@@ -116,15 +118,35 @@ bool Cpu65816::executeNextInstruction() {
             mStack.push16Bit(mProgramAddress.getOffset());
             mStack.push8Bit(mCpuStatus.getRegisterValue());
             mCpuStatus.setInterruptDisableFlag();
-            mProgramAddress = Address(0x00, mSystemBus.readTwoBytes(Address(0x00, 0xFFEE)));
+            mProgramAddress = Address(0x00, mSystemBus.readTwoBytes(Address(0x00, INTERRUPT_VECTOR_NATIVE_IRQ)));
         } else {
             mStack.push16Bit(mProgramAddress.getOffset());
             mStack.push8Bit(mCpuStatus.getRegisterValue());
             mCpuStatus.setInterruptDisableFlag();
-            mProgramAddress = Address(0x00, mSystemBus.readTwoBytes(Address(0x00, 0xFFFE)));
+            mProgramAddress = Address(0x00, mSystemBus.readTwoBytes(Address(0x00, INTERRUPT_VECTOR_EMULATION_BRK_IRQ)));
         }
     }
-
+    // Edge detect NMI
+    bool newNmi = nmi->get();
+    if(!newNmi && mPins.NMI) {
+        // De-activated
+        mPins.NMI = false;
+    } else if(newNmi && !mPins.NMI) {
+        // Activated
+        mPins.NMI = true;
+        if (!mCpuStatus.emulationFlag()) {
+            mStack.push8Bit(mProgramAddress.getBank());
+            mStack.push16Bit(mProgramAddress.getOffset());
+            mStack.push8Bit(mCpuStatus.getRegisterValue());
+            mCpuStatus.setInterruptDisableFlag();
+            mProgramAddress = Address(0x00, mSystemBus.readTwoBytes(Address(0x00, INTERRUPT_VECTOR_NATIVE_NMI)));
+        } else {
+            mStack.push16Bit(mProgramAddress.getOffset());
+            mStack.push8Bit(mCpuStatus.getRegisterValue());
+            mCpuStatus.setInterruptDisableFlag();
+            mProgramAddress = Address(0x00, mSystemBus.readTwoBytes(Address(0x00, INTERRUPT_VECTOR_EMULATION_NMI)));
+        }
+    }
     // Fetch the instruction
     const uint8_t instruction = mSystemBus.readByte(mProgramAddress);
     OpCode opCode = OP_CODE_TABLE[instruction];

@@ -47,7 +47,8 @@ add_executable(emulator
         src/main.cpp
         src/devices/Ram.cpp
         src/devices/Rom.cpp
-        src/devices/Via.cpp)
+        src/devices/Via.cpp
+        src/devices/InterruptStatus.cpp)
 
 target_include_directories(emulator PRIVATE
         src/

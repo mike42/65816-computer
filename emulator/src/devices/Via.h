@@ -1,7 +1,9 @@
 #ifndef EMULATOR_VIA_H
 #define EMULATOR_VIA_H
 
+#include <memory>
 #include "SystemBusDevice.h"
+#include "InterruptStatus.h"
 
 /**
  * State of the VIA
@@ -54,10 +56,15 @@ public:
     uint8_t readByte(const Address &) override;
     bool decodeAddress(const Address &, Address &) override;
     void clockTick(int ticks) override;
+    std::shared_ptr<InterruptStatus> getIrq();
 private:
+    void updateIrq();
     void startTimer1();
 
     ViaState state;
+
+    std::shared_ptr<InterruptStatus> interrupt;
+
 };
 
 

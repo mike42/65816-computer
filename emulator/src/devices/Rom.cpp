@@ -32,26 +32,3 @@ bool Rom::decodeAddress(const Address &in, Address &out) {
 uint16_t Rom::vector_at(uint16_t offset) {
     return this->readByte(Address(0x00, offset)) + (this->readByte(Address(0x00, offset + 1)) << 8);
 }
-
-NativeModeInterrupts Rom::getNativeModeInterrupts() {
-    return {
-            .coProcessorEnable = this->vector_at(0xFFE4),
-            .brk = this->vector_at(0xFFE6),
-            .abort = this->vector_at(0xFFE8),
-            .nonMaskableInterrupt = this->vector_at(0xFFEA),
-            .reset = this->vector_at(0xFFEC),
-            .interruptRequest = this->vector_at(0xFFEE)
-
-    };
-}
-
-EmulationModeInterrupts Rom::getEmulationModeInterrupts() {
-    return {
-            .coProcessorEnable = this->vector_at(0xFFF4),
-            .unused = this->vector_at(0xFFF6),
-            .abort = this->vector_at(0xFFF8),
-            .nonMaskableInterrupt = this->vector_at(0xFFFA),
-            .reset = this->vector_at(0xFFFC),
-            .brkIrq = this->vector_at(0xFFFE),
-    };
-}
