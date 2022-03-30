@@ -2,6 +2,8 @@
 #include "Ram.h"
 #include "Rom.h"
 #include "Via.h"
+#include "Uart.h"
+#include "TerminalWrapper.h"
 
 #include <SystemBus.h>
 #include <Cpu65816.h>
@@ -15,9 +17,12 @@ int main(int argc, char **argv) {
     Ram ram = Ram(16);
     Rom rom = Rom("../rom/rom.bin");
     Via via = Via();
+    TerminalWrapper terminalWrapper = TerminalWrapper();
+    Uart uart = Uart(&terminalWrapper);
 
     SystemBus systemBus = SystemBus();
     systemBus.registerDevice(&via);
+    systemBus.registerDevice(&uart);
     systemBus.registerDevice(&rom);
     systemBus.registerDevice(&ram);
 

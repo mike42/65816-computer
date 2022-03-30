@@ -48,7 +48,11 @@ add_executable(emulator
         src/devices/Ram.cpp
         src/devices/Rom.cpp
         src/devices/Via.cpp
-        src/devices/InterruptStatus.cpp)
+        src/devices/InterruptStatus.cpp
+        src/devices/Uart.cpp
+        src/devices/TerminalWrapper.cpp)
+
+target_link_libraries(emulator curses)
 
 target_include_directories(emulator PRIVATE
         src/
