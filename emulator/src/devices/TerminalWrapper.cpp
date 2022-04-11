@@ -1,27 +1,31 @@
-#include <curses.h>
+#include <termios.h>
+#include <unistd.h>
 #include "TerminalWrapper.h"
 
 TerminalWrapper::TerminalWrapper() {
-    initscr();
-    cbreak();
-    noecho();
-    timeout(0);
+    struct termios attrs{};
+    tcgetattr(STDIN_FILENO, &attrs);
+    attrs.c_lflag &= ~(ECHO); // No local echo, send characters one at a time
+    attrs.c_lflag &= ~(ICANON);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &attrs);
 }
 
 TerminalWrapper::~TerminalWrapper() {
-    endwin();
+    struct termios attrs{};
+    tcgetattr(STDIN_FILENO, &attrs);
+    attrs.c_lflag |= ECHO; // Set terminal back to 'normal'?
+    attrs.c_lflag |= ICANON;
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &attrs);
 }
 
-void TerminalWrapper::write(char ch) {
-    printw("%c", ch);
-    refresh();
+void TerminalWrapper::writeChar(char ch) {
+    write(STDOUT_FILENO, &ch, 1);
 }
 
-char TerminalWrapper::read() {
-    int intChar = getch();
-    if(intChar == -1) {
-        return 0;
+char TerminalWrapper::readChar() {
+    char c;
+    if(read(STDIN_FILENO, &c, 1) == 1) {
+        return c;
     }
-    // Control characters will not work here..
-    return (char)intChar;
+    return 0;
 }

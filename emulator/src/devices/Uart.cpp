@@ -31,13 +31,13 @@ void Uart::storeByte(const Address &address, uint8_t value) {
     // Regular registers
     switch (reg) {
         case UART_THR:
-            terminal->write((char)value);
+            terminal->writeChar((char) value);
             return;
         case UART_LCR:
             state.lineControlRegister = value;
             return;
     }
-    // If we get here, attempt was made to write to register that is not implemented.
+    // If we get here, attempt was made to writeChar to register that is not implemented.
     return;
 }
 
@@ -61,7 +61,7 @@ void Uart::tryRead() {
     if (state.charPending != 0x00) {
         return;
     }
-    char res = terminal->read();
+    char res = terminal->readChar();
     state.charPending = res;;
 }
 

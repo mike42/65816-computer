@@ -52,7 +52,7 @@ add_executable(emulator
         src/devices/Uart.cpp
         src/devices/TerminalWrapper.cpp)
 
-target_link_libraries(emulator curses)
+target_link_libraries(emulator)
 
 target_include_directories(emulator PRIVATE
         src/
