@@ -12,4 +12,4 @@ This is a learning project, and I am blogging about it as I progress.
 - [65C816 computer - initial prototype](https://mike42.me/blog/2022-02-65c816-computer-initial-prototype)
 - [Interfacing an NXP UART to an 8-bit computer](https://mike42.me/blog/2022-02-interfacing-an-nxp-uart-to-an-8-bit-computer)
 - [Let’s implement preemptive multitasking](https://mike42.me/blog/2022-03-lets-implement-preemptive-multitasking)
-
+- [Building an emulator for my 65C816 computer](https://mike42.me/blog/2022-04-building-an-emulator-for-my-65c816-computer)
