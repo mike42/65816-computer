@@ -40,17 +40,20 @@ public:
     void doBeforeStep(std::function<void()>);
     void doAfterStep(std::function<void()>);
     void onBreakPoint(std::function<void()>);
+    void onStp(std::function<void()>);
 
 private:
     std::function<void()> mOnBeforeStepHandler;
     std::function<void()> mOnAfterStepHandler;
     std::function<void()> mOnBreakPointHandler;
+    std::function<void()> mStpHandler;
 
     // Let's assume $00:$0000 is not a valid address for code
     Address mBreakPointAddress{0x00, 0x0000};
     bool mBreakpointHit = false;
 
     Cpu65816 &mCpu;
+
 };
 
 #endif // EMULATOR_CPU65816DEBUGGER_H

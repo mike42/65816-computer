@@ -15,7 +15,8 @@ int main(int argc, char **argv) {
     Log::vrb(LOG_TAG).str("+++ Lib65816 Sample Programs +++").show();
 
     Ram ram = Ram(16);
-    Rom rom = Rom("../rom/rom.bin");
+    std::string rom_filename = argc > 1 ? argv[1] : "../rom/rom.bin";
+    Rom rom = Rom(rom_filename);
     Via via = Via();
     TerminalWrapper terminalWrapper = TerminalWrapper();
     Uart uart = Uart(&terminalWrapper);
@@ -39,6 +40,10 @@ int main(int argc, char **argv) {
     debugger.onBreakPoint([&breakPointHit]() {
         breakPointHit = true;
     });
+    debugger.onStp([&cpu, &breakPointHit]() {
+        // Trigger clean exit when STP is used.
+        breakPointHit = true;
+    });
 
     while (!breakPointHit) {
         debugger.step();
@@ -47,4 +52,5 @@ int main(int argc, char **argv) {
     debugger.dumpCpu();
 
     Log::vrb(LOG_TAG).str("+++ Program completed +++").show();
+    return cpu.getA();
 }

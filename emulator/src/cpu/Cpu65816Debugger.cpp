@@ -34,6 +34,11 @@ void Cpu65816Debugger::step() {
     mOnBeforeStepHandler();
     const uint8_t instruction = mCpu.mSystemBus.readByte(mCpu.mProgramAddress);
     OpCode opCode = mCpu.OP_CODE_TABLE[instruction];
+    if(opCode.getCode() == 0xDB) {
+        // STP instruction handling.
+        mStpHandler();
+    }
+
     logOpCode(opCode);
 
     mCpu.executeNextInstruction();
@@ -63,6 +68,10 @@ void Cpu65816Debugger::onBreakPoint(const std::function<void()> handler) {
 
 void Cpu65816Debugger::setBreakPoint(const Address &address) {
     mBreakPointAddress = address;
+}
+
+void Cpu65816Debugger::onStp(const std::function<void()> handler) {
+    mStpHandler = handler;
 }
 
 void Cpu65816Debugger::logStatusRegister() const {

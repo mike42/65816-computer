@@ -42,7 +42,6 @@ void Cpu65816::executeMisc(OpCode &opCode) {
             addToProgramAddress(1);
             addToCycles(3);
             break;
-
         }
         case (0xCB):     // WAI
         {
