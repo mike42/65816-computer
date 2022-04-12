@@ -10,7 +10,6 @@ To build the emulator itself, you will need:
 
 - cmake - tested on 3.22.1
 - GCC - tested on 11.2.0.
-- The `curses` library.
 
 The emulator is only tested on Linux, and only implements hardware features which are used by the computer.
 
