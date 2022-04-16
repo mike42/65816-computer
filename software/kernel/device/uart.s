@@ -61,9 +61,9 @@ uart_printz:
   .a8                       ; Use 8-bit accumulator
   sep #%00100000
 @uart_printz_next:
-  lda 0, X
-  sta UART_THR
+  lda a:$0000, X            ; a: to avoid this being interpreted as direct page
   beq @uart_printz_done
+  sta UART_THR
   inx
   jmp @uart_printz_next
 @uart_printz_done:

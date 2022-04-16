@@ -13,7 +13,7 @@ kernel.bin: $(OBJECTS) system.cfg
 		$(OBJECTS)
 
 %.o: %.s
-	$(CA65) --cpu 65816 $<
+	$(CA65) --feature string_escapes --cpu 65816 --debug-info $<
 
 clean:
 	rm -f kernel.bin $(OBJECTS)
