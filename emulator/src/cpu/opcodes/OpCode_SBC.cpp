@@ -82,9 +82,9 @@ void Cpu65816::execute16BitSBC(OpCode &opCode) {
     if (borrowFromLastBit) mCpuStatus.clearCarryFlag();
     else mCpuStatus.setCarryFlag();
 
-    uint16_t result16Bit = Binary::lower8BitsOf(result32Bit);
+    uint16_t result16Bit = Binary::lower16BitsOf(result32Bit);
     // Update sign and zero flags
-    mCpuStatus.updateSignAndZeroFlagFrom8BitValue(result16Bit);
+    mCpuStatus.updateSignAndZeroFlagFrom16BitValue(result16Bit);
     // Store the 8 bit result in the accumulator
     mA = result16Bit;
 }
@@ -114,7 +114,7 @@ void Cpu65816::execute16BitBCDSBC(OpCode &opCode) {
     else mCpuStatus.setCarryFlag();
 
     mA = result;
-    mCpuStatus.updateSignAndZeroFlagFrom8BitValue(result);
+    mCpuStatus.updateSignAndZeroFlagFrom8BitValue(result); // FIXME 16-bit value, possible bug
 }
 
 void Cpu65816::executeSBC(OpCode &opCode) {

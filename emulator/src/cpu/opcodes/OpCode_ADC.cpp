@@ -82,9 +82,9 @@ void Cpu65816::execute16BitADC(OpCode &opCode) {
     if (carryOutOfLastBit) mCpuStatus.setCarryFlag();
     else mCpuStatus.clearCarryFlag();
 
-    uint8_t result16Bit = Binary::lower16BitsOf(result32Bit);
+    uint16_t result16Bit = Binary::lower16BitsOf(result32Bit);
     // Update sign and zero flags
-    mCpuStatus.updateSignAndZeroFlagFrom8BitValue(result16Bit);
+    mCpuStatus.updateSignAndZeroFlagFrom16BitValue(result16Bit);
     // Store the 16 bit result in the accumulator
     mA = result16Bit;
 }
@@ -114,7 +114,7 @@ void Cpu65816::execute16BitBCDADC(OpCode &opCode) {
     else mCpuStatus.clearCarryFlag();
 
     mA = result;
-    mCpuStatus.updateSignAndZeroFlagFrom8BitValue(result);
+    mCpuStatus.updateSignAndZeroFlagFrom8BitValue(result); // FIXME this is a 16-bit value, is this a bug?
 }
 
 void Cpu65816::executeADC(OpCode &opCode) {
