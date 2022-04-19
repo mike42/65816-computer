@@ -1,5 +1,5 @@
 ; main.s: entry point for kernel
-.import uart_init, uart_print_char, uart_recv_char, uart_printz, panic
+.import uart_init, uart_print_char, uart_recv_char, uart_printz, panic, __forty_two
 .export main
 
 .segment "CODE"
@@ -23,17 +23,12 @@ main:
   jsr uart_print_char
   jsr uart_recv_char
   jsr uart_print_char
-
   lda #$0a                        ; print a newline
   jsr uart_print_char
 
-  ; set some known values
-  lda #$abcd
-  ldx #$0123
-  ldy #$4567
-  jsr panic
+  jsr  __forty_two                ; run some C code?
 
-  lda #0                          ; Exit and return 0 in emulator.
-	stp
+  jsr panic
+  stp
 
 test_string: .asciiz "Hello, world!"

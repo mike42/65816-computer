@@ -37,7 +37,7 @@ panic:
   pha
   lda $09   ; X
   pha
-  lda $0a   ; A
+  lda $0b   ; A
   pha
   lda $0e   ; PC
   pha
