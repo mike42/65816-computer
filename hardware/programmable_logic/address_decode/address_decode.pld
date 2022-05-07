@@ -1,8 +1,8 @@
 GAL22V10
 AddrDecode
 
-Clock  RW     NC     NC     A19    A18    A17    A16    A15    A14    A13    GND
-NC     /RAM0  /RAM1  /ROM   /IO    /RD    /WR    NC     NC     NC     NC     VCC
+Clock  RW     VPA    VDA    A19    A18    A17    A16    A15    A14    A13    GND
+S0     /RAM0  /RAM1  /ROM   /IO    /RD    /WR    S1     S2     S3     S4     VCC
 
 ; ROM is the top 8 KiB of bank 0.
 ; prefix is 0000 111xxxxx xxxxxxxx
@@ -21,6 +21,12 @@ RAM1 = A19
 ; Qualify reads/writes with clock
 RD = Clock*RW
 WR = Clock*/RW
+
+; S0-S4 are inputs and outputs with no defined use.
+S1 = S0
+S2 = S0
+S3 = S0
+S4 = S0
 
 DESCRIPTION
 
