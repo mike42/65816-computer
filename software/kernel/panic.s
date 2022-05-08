@@ -49,7 +49,7 @@ panic:
 
 panic_message: .asciiz "\n** kernel panic at PC = $%u **\nA = $%u, X = $%u, Y = $%u\nDBR = $%u, PBR = $%u\nS = $%u, D = $%u, P = $%u\n"
 
-; kprintf: print a formatted string, in a style similar to printf. Contains dodgy stack usage, intentionally not exported.
+; kprintf: print a formatted string, in a style similar to printf. Contains unconventional stack usage, intentionally not exported.
 ; X - pointer to format string
 ; Stack - a 16 bit value will be read from the stack and formatted each time %c %s %x or %u is encountered
 kprintf:

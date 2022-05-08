@@ -1,5 +1,5 @@
 ; main.s: entry point for kernel
-.import uart_init, uart_print_char, uart_recv_char, uart_printz, panic, __forty_two
+.import uart_init, uart_print_char, uart_recv_char, uart_printz, panic, __forty_two, shell_main
 .export main
 
 .segment "CODE"
@@ -28,7 +28,8 @@ main:
 
   jsr  __forty_two                ; run some C code?
 
-  jsr panic
+  jsr shell_main
+  ;jsr panic
   stp
 
 test_string: .asciiz "Hello, world!"
