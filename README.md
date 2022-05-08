@@ -13,3 +13,11 @@ This is a learning project, and I am blogging about it as I progress.
 - [Interfacing an NXP UART to an 8-bit computer](https://mike42.me/blog/2022-02-interfacing-an-nxp-uart-to-an-8-bit-computer)
 - [Let’s implement preemptive multitasking](https://mike42.me/blog/2022-03-lets-implement-preemptive-multitasking)
 - [Building an emulator for my 65C816 computer](https://mike42.me/blog/2022-04-building-an-emulator-for-my-65c816-computer)
+
+## Licenses & acknowledgement
+
+With the exception of the files noted below, this work is © 2022 Michael Billington, and is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/).
+
+### 65816 emulator
+
+The files in the `emulator/` directory are derived from Francesco Rigoni's work, primarily [lib65816](https://github.com/FrancescoRigoni/Lib65816). The emulator application is licensed under the GNU General Public License, version 3. Please see the README and LICENSE file in that directory for details.
