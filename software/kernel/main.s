@@ -13,23 +13,8 @@ main:
   tcs
   tcd
 
-  jsr uart_init                   ; hardware init
-  ldx #test_string                ; test output
-  jsr uart_printz
-
-  jsr uart_recv_char              ; test input
-  jsr uart_print_char
-  jsr uart_recv_char
-  jsr uart_print_char
-  jsr uart_recv_char
-  jsr uart_print_char
-  lda #$0a                        ; print a newline
-  jsr uart_print_char
-
-  jsr  __forty_two                ; run some C code?
-
+  ; kick off the shell
   jsr shell_main
-  ;jsr panic
-  stp
+  jsr panic
 
 test_string: .asciiz "Hello, world!"

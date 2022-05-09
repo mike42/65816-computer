@@ -3,6 +3,7 @@
 ramfs.py: Create ramfs images for 65816 computer.
 """
 import argparse
+import os.path
 import sys
 from dataclasses import dataclass
 from struct import unpack_from, pack, unpack
@@ -302,9 +303,18 @@ def create(filename: str, files: list[str]):
     fs = RamFs()
     # Add files something like this
     for file in files:
-        fs.add_file(filename, bytearray(open(file, 'rb').read()))
+        _add_recursive(fs, file)
     fs.save_to_disk(filename)
     pass
+
+
+def _add_recursive(fs: RamFs, file: str):
+    if os.path.isdir(file):
+        fs.mkdir(file)
+        for subfile in os.listdir(file):
+            _add_recursive(fs, os.path.join(file, subfile))
+    else:
+        fs.add_file(file, bytearray(open(file, 'rb').read()))
 
 
 if __name__ == "__main__":

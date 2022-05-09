@@ -15,8 +15,12 @@ int main(int argc, char **argv) {
     Log::vrb(LOG_TAG).str("+++ Lib65816 Sample Programs +++").show();
 
     Ram ram = Ram(16);
-    std::string rom_filename = argc > 1 ? argv[1] : "../rom/rom.bin";
-    Rom rom = Rom(rom_filename);
+    std::string romFilename = argc > 1 ? argv[1] : "../rom/rom.bin";
+    Rom rom = Rom(romFilename);
+    if(argc > 2) {
+        std::string ramfsFilename = argv[2];
+        ram.loadFromFile(ramfsFilename, Address(0x08, 0x000000), 524288);
+    }
     Via via = Via();
     TerminalWrapper terminalWrapper = TerminalWrapper();
     Uart uart = Uart(&terminalWrapper);

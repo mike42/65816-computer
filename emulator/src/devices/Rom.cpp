@@ -8,7 +8,7 @@
 Rom::~Rom() = default;
 
 Rom::Rom(const std::string &file_name) {
-    FILE *fp = fopen(file_name.c_str(), "r");
+    FILE *fp = fopen(file_name.c_str(), "rb");
     assert(fp != nullptr);
     size_t bytes_read = fread(this->rom, 1, ROM_SIZE, fp);
     fclose(fp);
