@@ -68,7 +68,7 @@ shell_next_command:
 
 shell_next_char:
     jsr uart_recv_char             ; wait for a character
-    ldx #0
+    ldx shell_state
     jmp (shell_parse_table, X)
 
 shell_parse_default:
@@ -99,13 +99,22 @@ shell_parse_default:
     jmp shell_next_char
 
 shell_parse_esc:
-    ; do nothing
+    cmp #'['
+    bne @not_left_bracket
+    lda #SHELL_STATE_CODE
+    sta shell_state
+    jmp shell_next_char
+@not_left_bracket:
+    lda #SHELL_STATE_DEFAULT
+    sta shell_state
     jmp shell_next_char
 
 shell_parse_code:
+    ; reset to normal state
+    lda #SHELL_STATE_DEFAULT
+    sta shell_state
     ; do nothing
     jmp shell_next_char
-
 
 shell_parse_table:
 .word shell_parse_default
@@ -183,10 +192,9 @@ shell_shortcut_delete_to_line_start:
     rts
 
 shell_shortcut_esc:
-    ldx #shell_shortcut_esc_str
-    jsr uart_printz
+    lda #SHELL_STATE_ESC
+    sta shell_state
     rts
-shell_shortcut_esc_str: .asciiz "^["
 
 shell_shortcut_backspace:
     ldx shell_buffer_used               ; skip if line empty (shell_buffer_used = 0)
