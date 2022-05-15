@@ -4,18 +4,59 @@
 
 ; simple shell. this is part of the kernel for now
 
-.segment "BSS"
+; Constants for ASCII control characters
+ASCII_NUL := $00
+ASCII_SOH := $01
+ASCII_STX := $02
+ASCII_ETX := $03
+ASCII_EOT := $04
+ASCII_ENQ := $05
+ASCII_ACK := $06
+ASCII_BEL := $07
+ASCII_BS := $08
+ASCII_HT := $09
+ASCII_LF := $0a
+ASCII_VT := $0b
+ASCII_FF := $0c
+ASCII_CR := $0d
+ASCII_SO := $0e
+ASCII_SI := $0f
+ASCII_DLE := $10
+ASCII_DC1 := $11
+ASCII_DC2 := $12
+ASCII_DC3 := $13
+ASCII_DC4 := $14
+ASCII_NAK := $15
+ASCII_SYN := $16
+ASCII_ETB := $17
+ASCII_CAN := $18
+ASCII_EM := $19
+ASCII_SUB := $1a
+ASCII_ESC := $1b
+ASCII_FS := $1c
+ASCII_GS := $1d
+ASCII_RS := $1e
+ASCII_US := $1f
+ASCII_DEL := $7f
 
-shell_buffer: .res 64
+SHELL_BUF_MAX := 64
+
+; Incoming characters are parsed via a state machine
+SHELL_STATE_DEFAULT := 0    ; expect ascii or escape code
+SHELL_STATE_ESC := 2        ; ESC has been pressed. [ now has special meaning
+SHELL_STATE_CODE := 4       ; ESC [ has been pressed. Number, semicolon, or one-letter code expected.
+
+.segment "BSS"
+shell_buffer: .res SHELL_BUF_MAX
 shell_buffer_used: .res 2
-shell_tmp_1: .res 2
+shell_state: .res 2
 
 .segment "CODE"
 shell_main:
     .a16                           ; use 16-bit accumulator and index registers
     .i16
     rep #%00110000
-
+    stz shell_state
     ldx #shell_welcome             ; print welcome message
     jsr uart_printz
     jsr shell_newline
@@ -27,14 +68,18 @@ shell_next_command:
 
 shell_next_char:
     jsr uart_recv_char             ; wait for a character
-    cmp #$0a                       ; return key pressed? - might need to be $0d
+    ldx #0
+    jmp (shell_parse_table, X)
+
+shell_parse_default:
+    cmp #ASCII_LF                  ; return key pressed? - might need to be ASCII_CR
     beq @run_command               ; run the command
     cmp #32                        ; Check for control characters 0-31, which are ^@, then ^A through ^Z, then ^[, ^\, ^], ^^, ^_
     bcc @ascii_control_code
-    cmp #$7f
-    beq @ascii_del
+    cmp #ASCII_DEL
+    beq @ascii_del_pressed
     ldx shell_buffer_used          ; append any other key to buffer
-    cpx #64                        ; .. unless buffer full
+    cpx #SHELL_BUF_MAX             ; .. unless buffer full
     bcs shell_next_char
     sta shell_buffer, X            ; ascii printable is assumed, save to buffer
     inx
@@ -45,13 +90,27 @@ shell_next_char:
 @run_command:
     jsr shell_newline
     jmp shell_run_command
-@ascii_del:
+@ascii_del_pressed:
     lda #32
 @ascii_control_code:               ; run a method from control code table
     asl
     tax
     jsr (ascii_control_code_table, X)
     jmp shell_next_char
+
+shell_parse_esc:
+    ; do nothing
+    jmp shell_next_char
+
+shell_parse_code:
+    ; do nothing
+    jmp shell_next_char
+
+
+shell_parse_table:
+.word shell_parse_default
+.word shell_parse_esc
+.word shell_parse_code
 
 ascii_control_code_table:
 .word shell_shortcut_nop           ; ^@
