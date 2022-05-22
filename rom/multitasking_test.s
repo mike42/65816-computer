@@ -53,13 +53,13 @@ multitasking_test:
   ; set up timer 1
   lda #%01000000                  ; set ACR. first two bits = 01 is continuous interrupts for T1
   sta ACR
-  lda #%11000000                  ; enable VIA interrupt for T1
-  sta IER
   ; set up a timer at ~65535 clock pulses.
   lda #$ff                        ; set T1 low-order counter
   sta T1C_L
   lda #$ff                        ; set T1 high-order counter
   sta T1C_H
+  lda #%11000000                  ; enable VIA interrupt for T1
+  sta IER
 
   ; start running task 1
   jmp task_1_main

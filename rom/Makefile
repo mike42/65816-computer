@@ -2,6 +2,10 @@ CA65=/usr/bin/ca65
 LD65=/usr/bin/ld65
 MINIPRO=minipro
 
+.PHONY: all
+
+all: rom.bin nop.bin
+
 rom.bin: main.o multitasking_test.o uart_test.o system.cfg
 	$(LD65) -o rom.bin \
 		-C system.cfg \
@@ -10,6 +14,9 @@ rom.bin: main.o multitasking_test.o uart_test.o system.cfg
 		uart_test.o
 	# padded to 32k
 	truncate -s 32768 rom.bin
+
+nop.bin:
+	python3 -c "open('nop.bin', 'wb').write(b'\xea' * 32768)"
 
 main.o: main.s
 	$(CA65) --cpu 65816 main.s
