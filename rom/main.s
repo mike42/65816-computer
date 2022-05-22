@@ -122,7 +122,7 @@ post_ok:                           ; all good, emit celebratory beep, approx 1KH
     jmp post_done
 
 post_done:                         ; run some code
-
+    jsr uart_test
     jmp multitasking_test
 
 irq:

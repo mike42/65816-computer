@@ -4,7 +4,7 @@
 .export uart_test
 
 ; Assuming /CSA is connected to IO1
-UART_BASE = $c200
+UART_BASE = $c800
 
 ; UART registers
 ; Not included: FIFO ready register, Xon1 Xon2 words.
@@ -45,6 +45,7 @@ uart_test:
 @again:
   jsr test_print
   jsr test_recv
+  jsr test_print_2
 ;  jsr test_ansi
 ;  jmp @again
   rts
@@ -52,7 +53,7 @@ uart_test:
 test_print:                 ; Send test string to UART
   ldx #0
 @test_char:
-  lda test_string, X
+  lda test_string_1, X
   beq @test_done
   sta UART_THR
   inx
@@ -60,7 +61,20 @@ test_print:                 ; Send test string to UART
 @test_done:
   rts
 
-test_string: .asciiz "Hello, world!"
+test_string_1: .asciiz "Hello, world!"
+
+test_print_2:                 ; Send test string to UART
+  ldx #0
+@test_char:
+  lda test_string_2, X
+  beq @test_done
+  sta UART_THR
+  inx
+  jmp @test_char
+@test_done:
+  rts
+
+test_string_2: .asciiz "Done"
 ;  .byte $1b
 ;  .asciiz "[31;42mHello, world!"
 
