@@ -1,6 +1,6 @@
 # 65816 computer
 
-This is a prototype 65C816-based computer. It currently features a 1.8432 MHz processor, 1 megabyte of static RAM, and a 65C22 I/O port.
+This is a prototype 65C816-based computer. It features a 1.8432 MHz processor, 1 megabyte of static RAM, a 65C22 I/O port, and an NXP SC16C752 dual UART.
 
 The ROM contains a simple test program.
 
@@ -13,6 +13,8 @@ This is a learning project, and I am blogging about it as I progress.
 - [Interfacing an NXP UART to an 8-bit computer](https://mike42.me/blog/2022-02-interfacing-an-nxp-uart-to-an-8-bit-computer)
 - [Let’s implement preemptive multitasking](https://mike42.me/blog/2022-03-lets-implement-preemptive-multitasking)
 - [Building an emulator for my 65C816 computer](https://mike42.me/blog/2022-04-building-an-emulator-for-my-65c816-computer)
+- [65C816 computer - second prototype](https://mike42.me/blog/2022-05-65c816-computer-second-prototype)
+- [Building a 65C816 test board](https://mike42.me/blog/2022-06-building-a-65c816-test-board)
 
 ## Licenses & acknowledgement
 
