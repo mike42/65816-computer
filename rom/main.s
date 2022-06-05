@@ -1,4 +1,6 @@
-.import nmi, multitasking_test, uart_test
+.import nmi, multitasking_test, uart_init, __test, uart_printz
+
+.export __print
 
 .macro pause len                   ; time-wasting loop as macro
     lda #len
@@ -122,8 +124,41 @@ post_ok:                           ; all good, emit celebratory beep, approx 1KH
     jmp post_done
 
 post_done:                         ; run some code
-    jsr uart_test
-    jmp multitasking_test
+    ;jsr uart_test
+    ;jmp multitasking_test
+
+    .a16                            ; use 16-bit accumulator and index registers
+    .i16
+    rep #%00110000
+    jsr uart_init
+
+    jsr __test
+    stp
+
+; print(const char *arg1)
+__print:
+	.a16
+	.i16
+	tsc
+	sec
+	sbc	#L2
+	tcs
+	phd
+	tcd
+arg1_0 := 3
+	ldx	<L2+arg1_0
+	jsr uart_printz
+L4:
+	lda	<L2+1
+	sta	<L2+1+2
+	pld
+	tsc
+	clc
+	adc	#L2+2
+	tcs
+	rts
+L2 := 0
+L3 := 1
 
 irq:
     rti

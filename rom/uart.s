@@ -1,7 +1,6 @@
-;
-; Test program for the SC16C752B dual UART from NXP
-;
-.export uart_test
+; uart.s: driver for NXP SC16C752 UART
+
+.export uart_init, uart_print_char, uart_recv_char, uart_printz
 
 ; Assuming /CSA is connected to IO1
 UART_BASE = $c800
@@ -27,10 +26,10 @@ UART_TCR = UART_BASE + 6    ; Transmission Control Register (TCR) - R/W
 UART_TLR = UART_BASE + 7    ; Trigger Level Register (TLR) - R/W
 
 .segment "CODE"
-uart_test:
-  .a8                       ; use 8-bit accumulator and index registers
-  .i8
-  sep #%00110000
+; uart_init: Initialize the UART
+uart_init:
+  .a8                       ; Use 8-bit accumulator
+  sep #%00100000
 
   lda #$80                  ; Enable divisor latches
   sta UART_LCR
@@ -42,84 +41,45 @@ uart_test:
   sta UART_LCR
   lda #%00001111            ; Enable FIFO, set DMA mode 1
   sta UART_FCR
-@again:
-  jsr test_print
-  jsr test_recv
-  jsr test_print_2
-;  jsr test_ansi
-;  jmp @again
+  .a16                      ; Revert to 16-bit accumulator
+  rep #%00100000
   rts
 
-test_print:                 ; Send test string to UART
-  ldx #0
-@test_char:
-  lda test_string_1, X
-  beq @test_done
+; uart_print_char: Print a single character to the UART
+; A - ASCII character to print. Only the least significant 8 bits are used
+uart_print_char:
+  .a8                       ; Use 8-bit accumulator
+  sep #%00100000
+  sta UART_THR
+  .a16                      ; Revert to 16-bit accumulator
+  rep #%00100000
+  rts
+
+; uart_printz: Print characters to UART until a null is reached
+; X - pointer to string to print
+uart_printz:
+  .a8                       ; Use 8-bit accumulator
+  sep #%00100000
+@uart_printz_next:
+  lda a:$0000, X            ; a: to avoid this being interpreted as direct page
+  beq @uart_printz_done
   sta UART_THR
   inx
-  jmp @test_char
-@test_done:
+  jmp @uart_printz_next
+@uart_printz_done:
+  .a16                      ; Revert to 16-bit accumulator
+  rep #%00100000
   rts
 
-test_string_1: .asciiz "Hello, world!"
-
-test_print_2:                 ; Send test string to UART
-  ldx #0
-@test_char:
-  lda test_string_2, X
-  beq @test_done
-  sta UART_THR
-  inx
-  jmp @test_char
-@test_done:
-  rts
-
-test_string_2: .asciiz "Done"
-;  .byte $1b
-;  .asciiz "[31;42mHello, world!"
-
-test_recv:                  ; Receive three characters and echo them back
-  jsr uart_recv_char
-  sta UART_THR
-  jsr uart_recv_char
-  sta UART_THR
-  jsr uart_recv_char
-  sta UART_THR
-  rts
-
-uart_recv_char:             ; Receive next char to A register
+; uart_recv_char: Block until a character is received, then load result to A register.
+uart_recv_char:
+  .a8                       ; Use 8-bit accumulator
+  sep #%00100000
   lda UART_LSR
   and #%00000001
   cmp #%00000001
   bne uart_recv_char
   lda UART_RHR
+  .a16                      ; Revert to 16-bit accumulator
+  rep #%00100000
   rts
-
-;test_ansi:
-;; Print ANSI code for clear
-;  ldx #0
-;@clear_char:
-;  lda ansi_clear_str, X
-;  beq @clear_done
-;  sta UART_THR
-;  inx
-;  jmp @clear_char
-;@clear_done:
-;; Print ANSI code for home
-;  ldx #0
-;@home_char:
-;  lda ansi_home_str, X
-;  beq @home_done
-;  sta UART_THR
-;  inx
-;  jmp @home_char
-;@home_done:
-;  rts
-;
-;ansi_clear_str:
-;  .byte $1b
-;  .asciiz "[J"
-;
-;ansi_home_str:
-;  .byte $1b
-;  .asciiz "[H"

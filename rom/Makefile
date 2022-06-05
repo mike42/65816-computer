@@ -6,12 +6,13 @@ MINIPRO=minipro
 
 all: rom.bin nop.bin
 
-rom.bin: main.o multitasking_test.o uart_test.o system.cfg
+rom.bin: main.o multitasking_test.o uart.o c_test.o system.cfg
 	$(LD65) -o rom.bin \
 		-C system.cfg \
 		main.o \
 		multitasking_test.o \
-		uart_test.o
+		c_test.o \
+		uart.o
 	# padded to 32k
 	truncate -s 32768 rom.bin
 
@@ -24,11 +25,14 @@ main.o: main.s
 multitasking_test.o: multitasking_test.s
 	$(CA65) --cpu 65816 multitasking_test.s
 
-uart_test.o: uart_test.s
-	$(CA65) --cpu 65816 uart_test.s
+c_test.o: c_test.s
+	$(CA65) --cpu 65816 c_test.s
+
+uart.o: uart.s
+	$(CA65) --cpu 65816 uart.s
 
 clean:
-	rm -f main.o multitasking_test.o uart_test.o rom.bin
+	rm -f main.o multitasking_test.o uart.o c_test.o rom.bin
 
 flashrom: rom.bin
 	$(MINIPRO) -p AT28C256 -w rom.bin
