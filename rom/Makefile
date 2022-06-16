@@ -2,37 +2,28 @@ CA65=/usr/bin/ca65
 LD65=/usr/bin/ld65
 MINIPRO=minipro
 
-.PHONY: all
+.PHONY: all clean flashrom
 
 all: rom.bin nop.bin
 
-rom.bin: main.o multitasking_test.o uart.o c_test.o system.cfg
+SOURCES = $(wildcard *.s)
+OBJECTS = $(SOURCES:.s=.o)
+
+rom.bin: $(OBJECTS) system.cfg
 	$(LD65) -o rom.bin \
 		-C system.cfg \
-		main.o \
-		multitasking_test.o \
-		c_test.o \
-		uart.o
+		$(OBJECTS)
 	# padded to 32k
 	truncate -s 32768 rom.bin
 
 nop.bin:
 	python3 -c "open('nop.bin', 'wb').write(b'\xea' * 32768)"
 
-main.o: main.s
-	$(CA65) --cpu 65816 main.s
-
-multitasking_test.o: multitasking_test.s
-	$(CA65) --cpu 65816 multitasking_test.s
-
-c_test.o: c_test.s
-	$(CA65) --cpu 65816 c_test.s
-
-uart.o: uart.s
-	$(CA65) --cpu 65816 uart.s
+%.o: %.s
+	$(CA65) --feature string_escapes --cpu 65816 --debug-info $<
 
 clean:
-	rm -f main.o multitasking_test.o uart.o c_test.o rom.bin
+	rm -f rom.bin $(OBJECTS) nop.bin
 
 flashrom: rom.bin
 	$(MINIPRO) -p AT28C256 -w rom.bin
