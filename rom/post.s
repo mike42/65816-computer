@@ -1,7 +1,5 @@
-;
 ; post.s: Power-on self test routine for ROM.
-;
-.import post_done
+.import post_done, VIA_BASE
 .export post_start
 
 .macro pause len                   ; time-wasting loop as macro
@@ -96,10 +94,10 @@ post_fail_via:
     blink
     jmp post_fail_via
 
-VIA_DDRB = $c002
-VIA_T1C_L = $c004
-VIA_T1C_H = $c005
-VIA_ACR = $c00b
+VIA_DDRB = VIA_BASE + $02
+VIA_T1C_L = VIA_BASE + $04
+VIA_T1C_H = VIA_BASE + $05
+VIA_ACR = VIA_BASE + $0b
 BEEP_FREQ_DIVIDER = 461            ; 1KHz, formula is CPU clock / (desired frequency * 2), or 921600 / (1000 * 2) ~= 461
 post_ok:                           ; all good, emit celebratory beep, approx 1KHz for 1/10th second
     ; Start beep

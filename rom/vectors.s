@@ -1,9 +1,6 @@
-.import nmi, reset
+.import  reset
 
 .segment "CODE"
-irq:
-    rti
-
 unused_interrupt:                 ; Probably make this into a crash.
     rti
 
