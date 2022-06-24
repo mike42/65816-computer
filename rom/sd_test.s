@@ -1,7 +1,7 @@
 ; sd_test.s: Test for reading from SD card.
 
 .import VIA_BASE, uart_print_char, uart_printz
-.export sd_test_main, spi_sd_init, spi_sd_block_read, hexdump_memory_block
+.export spi_sd_init, spi_sd_block_read, hexdump_memory_block
 
 VIA_PORTA = VIA_BASE + $01
 VIA_DDRA = VIA_BASE + $03
@@ -15,60 +15,23 @@ CLK  = %00000010
 OUTPUT_PINS = CS | MOSI | CLK
 
 .segment "ZEROPAGE"
-string_ptr: .res 2        ; Pointer for printing
-out_tmp:    .res 1        ; Used for shifting bit out
-in_tmp:     .res 1        ; Used when shifing bits in
+string_ptr: .res 2                 ; Pointer for printing
+out_tmp:    .res 1                 ; Used for shifting bit out
+in_tmp:     .res 1                 ; Used when shifing bits in
 
 .segment "BSS"
 io_block_id:              .res 4
-io_buffer:                .res 512
 
 .segment "CODE"
-sd_test_main:
-    .a16                           ; use 16-bit accumulator and index registers
-    .i16
-    rep #%00110000
-    jsr spi_sd_init                ; initialise the SD card
-
-    ldx #$7c00                     ; destination address (TODO - this is currently ignored).
-    lda #$0000                     ; block number high
-    ldy #$0000                     ; block number low
-    jsr spi_sd_block_read
-
-    ldx #io_buffer                 ; source address where this is actually written
-    jsr hexdump_memory_block
-
-    ldx #$7e00                     ; destination address (TODO - this is currently ignored).
-    lda #$0000                     ; block number high
-    ldy #$0001                     ; block number low
-    jsr spi_sd_block_read
-
-    ldx #io_buffer                 ; source address where this is actually written
-    jsr hexdump_memory_block
-
-    ; Print where the stuff was *meant* to be written..
-    ldx #$7c00                     ; source address
-    jsr hexdump_memory_block
-
-    rts
-
 spi_sd_init:                       ; prepare for use of SD card through 65C22 VIA
+    .a16                           ; assume 16-bit accumulator and index registers
+    .i16
     jsr via_setup
     jsr sd_reset
     rts
 
 spi_sd_block_read:
-    .a16                            ; assume 16-bit accumulator and index registers
-    .i16
-    sty io_block_id
-    sta io_block_id + 2
-    php
-    .a8                            ; use 8-bit accumulator and index registers
-    .i8
-    sep #%00110000
-    jsr sd_read_single_block       ; TODO convert to 16-bit.
-    plp
-    rts
+    jmp sd_read_single_block
 
 ; Set up pin directions on the VIA and set initial values.
 via_setup:
@@ -85,10 +48,8 @@ via_setup:
 
 ; Reset sequence for SD card, places it in SPI mode, completes initialization.
 sd_reset:
-    php
-    .a8                            ; use 8-bit accumulator and index registers
-    .i8
-    sep #%00110000
+    .a16                           ; assume 16-bit accumulator and index registers
+    .i16
     jsr spi_nothing_byte           ; 80 cycles with MOSI and CS high.
     jsr spi_nothing_byte
     jsr spi_nothing_byte
@@ -100,44 +61,42 @@ sd_reset:
     jsr spi_nothing_byte
     jsr spi_nothing_byte
     jsr sd_cmd_go_idle_state
-    cmp #$01                 ; Check for idle state
+    cmp #$01                       ; Check for idle state
     bne @sd_reset_fail
     jsr sd_cmd_send_if_cond
-    cmp #01                  ; Expect command to be supported, indicating 2.x SD card.
+    cmp #01                        ; Expect command to be supported, indicating 2.x SD card.
     bne @sd_reset_fail
-    jsr sd_cmd_read_ocr      ; Do not care about response here, but expect it to be supported
+    jsr sd_cmd_read_ocr            ; Do not care about response here, but expect it to be supported
     cmp #$01
     bne @sd_reset_fail
-    jsr sd_cmd_app_cmd       ; Send app command to activiate initialisation process
+    jsr sd_cmd_app_cmd             ; Send app command to activiate initialisation process
     cmp #$01
     bne @sd_reset_fail
     jsr sd_acmd_sd_send_op_cond
-    cmp #$01                 ; Expect initialisation in progress.
+    cmp #$01                       ; Expect initialisation in progress.
     bne @sd_reset_fail
-    ldx #20                  ; max attempts
-@reset_wait:               ; Repeat last step until initialisation is complete
+    ldx #20                        ; max attempts
+@reset_wait:                       ; Repeat last step until initialisation is complete
     phx
     jsr sd_cmd_app_cmd
     jsr sd_acmd_sd_send_op_cond
     plx
-    cmp #$00                 ; Init complete
+    cmp #$00                       ; Init complete
     beq @sd_reset_init_ok
     dex
-    cpx #0                   ; max attempts exceeded
-    bne @reset_wait          ; repeat up to maximum, falls through to failure otherwise
+    cpx #0                         ; max attempts exceeded
+    bne @reset_wait                ; repeat up to maximum, falls through to failure otherwise
 @sd_reset_fail:
-    plp
     jmp reset_fail
 
 @sd_reset_init_ok:
-    jsr sd_cmd_read_ocr      ; TODO read response bit here for CCS
-    plp
+    jsr sd_cmd_read_ocr            ; TODO read response bit here for CCS
     rts
 
 ; send SD card CMD0
 sd_cmd_go_idle_state:
-    .a8                            ; assume 8-bit accumulator and index registers
-    .i8
+    .a16                           ; assume 16-bit accumulator and index registers
+    .i16
     ; Select chip
     jsr sd_command_start
     ; Send command
@@ -163,8 +122,8 @@ sd_cmd_go_idle_state:
 
 ; send SD card CMD8
 sd_cmd_send_if_cond:
-    .a8                            ; assume 8-bit accumulator and index registers
-    .i8
+    .a16                            ; assume 16-bit accumulator and index registers
+    .i16
     ; Select chip
     jsr sd_command_start
     lda #%01001000
@@ -196,8 +155,8 @@ sd_cmd_send_if_cond:
 
 ; send SD card CMD58
 sd_cmd_read_ocr:
-    .a8                            ; assume 8-bit accumulator and index registers
-    .i8
+    .a16                            ; assume 16-bit accumulator and index registers
+    .i16
     jsr sd_command_start
     lda #%01111010
     jsr sd_byte_send
@@ -233,8 +192,8 @@ sd_cmd_read_ocr:
 
 ; send SD card CMD55
 sd_cmd_app_cmd:
-    .a8                            ; assume 8-bit accumulator and index registers
-    .i8
+    .a16                            ; assume 16-bit accumulator and index registers
+    .i16
     jsr sd_command_start
     lda #%01110111
     jsr sd_byte_send
@@ -258,8 +217,8 @@ sd_cmd_app_cmd:
 
 ; send SD card ACMD41
 sd_acmd_sd_send_op_cond:
-    .a8                            ; assume 8-bit accumulator and index registers
-    .i8
+    .a16                            ; assume 16-bit accumulator and index registers
+    .i16
     jsr sd_command_start
     lda #%01101001
     jsr sd_byte_send
@@ -283,11 +242,34 @@ sd_acmd_sd_send_op_cond:
 
 ; send SD card CMD17
 sd_read_single_block:
-    .a8                            ; assume 8-bit accumulator and index registers
-    .i8
+    .a16                            ; assume 16-bit accumulator and index registers
+    .i16
+    sty io_block_id
+    sta io_block_id + 2
+    stx string_ptr
+
+    ; clear the memory to help with debugging
+    ldy #0
+@clear_memory_next:
+    .a8                            ; Switch to 8-bit accumulator to save byte
+    sep #%00100000
+    lda #$ea
+    sta (string_ptr), Y
+    .a16                           ; Switch back to 16-bit accumulator
+    rep #%00100000
+    cpy #$01ff                     ; Repeat for Y = 0 ... 511
+    beq @clear_memory_done
+    iny
+    jmp @clear_memory_next
+@clear_memory_done:
+
     jsr sd_command_start
     lda #%01010001
     jsr sd_byte_send
+
+    ; Send out 4-byte block ID, MSB first
+    .a8                            ; Switch to 8-bit accumulator
+    sep #%00100000
     lda io_block_id + 3
     jsr sd_byte_send
     lda io_block_id + 2
@@ -296,6 +278,8 @@ sd_read_single_block:
     jsr sd_byte_send
     lda io_block_id
     jsr sd_byte_send
+    .a16                           ; Switch back to 16-bit accumulator
+    rep #%00100000
 
     jsr sd_first_byte_of_response
     cmp #$00                        ; OK, block coming up
@@ -303,78 +287,72 @@ sd_read_single_block:
     jsr sd_first_byte_of_response
     cmp #$fe                        ; Start of block
     bne @sd_read_single_block_fail
-
-    ldx #<io_buffer                 ; Set up pointer to I/O buffer
-    stx string_ptr
-    ldx #>io_buffer
-    stx string_ptr + 1
-
-@sd_read_page:                    ; read 255 bytes to I/O buffer, needs to be done twice
     ldy #$00
-@sd_read_page_next_byte:
-    lda #%11111111
     phy
+@sd_read_page_next_byte:
+    lda #%11111111                 ; fill byte
     jsr sd_byte_send
-    sta (string_ptr), Y
+    ; Write one byte at a time
+    .a8                            ; Switch to 8-bit accumulator to save byte
+    sep #%00100000
     ply
-    cpy #$ff
-    beq @sd_read_page_done
+    sta (string_ptr), Y
+    .a16                           ; Switch back to 16-bit accumulator
+    rep #%00100000
+    cpy #$01ff                     ; Repeat for Y = 0 ... 511
+    beq @sd_read_block_done
     iny
+    phy
     jmp @sd_read_page_next_byte
-@sd_read_page_done:               ; Done reading a page. Is this first or second?
-    ; Check high byte of string_ptr for second page
-    ldx #(>io_buffer + 1)
-    cpx string_ptr + 1
-    beq @sd_read_single_block_done
-    ; Bump to next page and repeat
-    stx string_ptr + 1
-    jmp @sd_read_page
-@sd_read_single_block_done:
-    lda #%11111111                  ; 16 byte CRC (ignored).
+@sd_read_block_done:               ; Done reading block
+    lda #%11111111                 ; 16 byte CRC (ignored).
     jsr sd_byte_send
     lda #%11111111
     jsr sd_byte_send
 @sd_read_single_block_fail:
     jsr sd_command_end
+
     rts
 
 ; Send $ff to the SD card, return the first non-fill byte we get back in the A register.
 ; Returns $ff if the SD does not respond with a non-fill byte after 255 bytes.
 sd_first_byte_of_response:
-    .a8                            ; assume 8-bit accumulator and index registers
-    .i8
-    ldx #$ff            ; Limit before failure
+    .a16                           ; assume 16-bit accumulator and index registers
+    .i16
+    ldx #$ff                       ; Limit before failure
 @spi_consume_fill_byte:
-    lda #%11111111      ; Fill
-    phx                 ; Preserve X, send the byte
+    lda #%11111111                 ; Fill
+    phx                            ; Preserve X, send the byte
     jsr sd_byte_send
     plx
-    cmp #%11111111      ; Empty response?
+    cmp #%11111111                 ; Empty response?
     bne @spi_consume_fill_bytes_done
-    dex                 ; Repeat up to limit
+    dex                            ; Repeat up to limit
     cpx #$00
     bne @spi_consume_fill_byte
 @spi_consume_fill_bytes_done:
     rts
 
 sd_command_start:
-    .a8                       ; assume 8-bit accumulator and index registers
-    .i8
-    jsr spi_nothing_byte      ; Send 8 bits of nothing without SD selected
-    lda #%11111111            ; Send 8 bits of nothing w/ SD selected
+    .a16                           ; assume 16-bit accumulator and index registers
+    .i16
+    jsr spi_nothing_byte           ; Send 8 bits of nothing without SD selected
+    lda #%11111111                 ; Send 8 bits of nothing w/ SD selected
     jsr sd_byte_send
     rts
 
     sd_command_end:
-    lda #%11111111            ; Send 8 bits of nothing w/ SD selected
+    lda #%11111111                 ; Send 8 bits of nothing w/ SD selected
     jsr sd_byte_send
-    jsr spi_nothing_byte      ; Send 8 bits of nothing without SD selected
+    jsr spi_nothing_byte           ; Send 8 bits of nothing without SD selected
     rts
 
 spi_nothing_byte:
-    .a8                            ; assume 8-bit accumulator and index registers
+    php
+    .a8                            ; use 8-bit accumulator and index registers
     .i8
-    ldx #8                    ; Send 8 bits of nothing, without SD selected
+    sep #%00110000
+    ldx #8                         ; Send 8 bits of nothing, without SD selected
 @command_start_bit:
     lda #(MOSI | CS)
     sta VIA_PORTA
@@ -383,11 +361,14 @@ spi_nothing_byte:
     dex
     cpx #0
     bne @command_start_bit
+    plp
     rts
 
 sd_byte_send:                      ; Send the byte stored in the A register
-    .a8                            ; assume 8-bit accumulator and index registers
+    php
+    .a8                            ; use 8-bit accumulator and index registers. TODO make this 16-bit
     .i8
+    sep #%00110000
     ldx #8
     sta out_tmp
     stz in_tmp
@@ -422,6 +403,7 @@ sd_byte_send:                      ; Send the byte stored in the A register
     cpx #0
     bne @sd_send_bit               ; Repeat until all 8 bits are sent
     lda in_tmp
+    plp
     rts
 
 reset_fail:
@@ -451,7 +433,7 @@ hexdump_page:
     rts
 
 ; Given address in string_ptr, prints a line. Eg.
-; 0c00  67 67 67 67 67 67 67 67  67 67 67 67 67 67 67 67  gggggggggggggggg
+; 0c00  67 67 67 67 67 67 67 67  67 67 67 67 67 67 67 67  |gggggggggggggggg|
 hexdump_line:
     .a8                            ; assume 8-bit accumulator and index registers
     .i8
