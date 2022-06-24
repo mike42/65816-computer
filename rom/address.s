@@ -1,4 +1,4 @@
-; address.s: Base addresses for I/O devices
+; address.s: Base addresses for I/O devices etc.
 .export VIA_BASE
 .export UART_BASE
 .export BOOTLOADER_BASE

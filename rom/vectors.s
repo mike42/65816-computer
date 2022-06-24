@@ -1,4 +1,5 @@
-.import  reset
+; vectors.s: Interrupt vectors for ROM
+.import reset, cop_handler
 
 .segment "CODE"
 unused_interrupt:                 ; Probably make this into a crash.
@@ -8,7 +9,7 @@ unused_interrupt:                 ; Probably make this into a crash.
 ; native mode interrupt vectors
 .word unused_interrupt            ; Reserved
 .word unused_interrupt            ; Reserved
-.word unused_interrupt            ; COP
+.word cop_handler                 ; COP
 .word unused_interrupt            ; BRK
 .word unused_interrupt            ; Abort
 .word unused_interrupt            ; NMI

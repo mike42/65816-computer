@@ -1,4 +1,4 @@
-; sd_test.s: Test for reading from SD card.
+; sd_card.s: Test for reading from SD card.
 
 .import VIA_BASE, uart_print_char, uart_printz
 .export spi_sd_init, spi_sd_block_read, hexdump_memory_block
@@ -516,22 +516,22 @@ shell_newline:
     jsr uart_print_char
     rts
 
-hex_print_byte:               ; print accumulator as two ascii digits (hex)
+hex_print_byte:                    ; print accumulator as two ascii digits (hex)
     .a8                            ; assume 8-bit accumulator and index registers
     .i8
-    pha                         ; store byte for later
-    lsr                         ; shift out lower nibble
+    pha                            ; store byte for later
+    lsr                            ; shift out lower nibble
     lsr
     lsr
     lsr
     tax
-    lda hex_chars, X            ; convert 0-15 to ascii char for hex digit
-    jsr uart_print_char         ; print upper nibble
-    pla                         ; retrieve byte again
-    and #$0f                    ; mask out upper nibble
+    lda hex_chars, X               ; convert 0-15 to ascii char for hex digit
+    jsr uart_print_char            ; print upper nibble
+    pla                            ; retrieve byte again
+    and #$0f                       ; mask out upper nibble
     tax
-    lda hex_chars, X            ; convert 0-15 to ascii char for hex digit
-    jsr uart_print_char         ; print lower nibble
+    lda hex_chars, X               ; convert 0-15 to ascii char for hex digit
+    jsr uart_print_char            ; print lower nibble
     rts
 hex_chars: .byte '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 

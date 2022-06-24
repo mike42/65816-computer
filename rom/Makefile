@@ -11,6 +11,7 @@ OBJECTS = $(SOURCES:.s=.o)
 
 rom.bin: $(OBJECTS) system.cfg
 	$(LD65) -o rom.bin \
+		-Ln rom.txt \
 		-C system.cfg \
 		$(OBJECTS)
 	# padded to 32k
@@ -23,7 +24,7 @@ nop.bin:
 	$(CA65) --feature string_escapes --cpu 65816 --debug-info $<
 
 clean:
-	rm -f rom.bin $(OBJECTS) nop.bin
+	rm -f rom.bin $(OBJECTS) nop.bin rom.txt
 
 flashrom: rom.bin
 	$(MINIPRO) -p AT28C256 -w rom.bin

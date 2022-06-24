@@ -1,4 +1,4 @@
-.import uart_printz, uart_print_char, uart_recv_char, panic
+.import uart_printz, uart_print_char, uart_recv_char
 
 .export shell_main
 

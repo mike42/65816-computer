@@ -1,6 +1,8 @@
 ; main.s: ROM startup code
 .import BOOTLOADER_BASE, post_start, uart_init, uart_printz, uart_recv_char, spi_sd_init, spi_sd_block_read, hexdump_memory_block
 
+.importzp ROM_PRINT_STRING
+
 .export reset, post_done
 
 .segment "CODE"
@@ -24,7 +26,6 @@ post_done:                         ; POST passed, time to run some code
 
 boot_from_sd:
     jsr spi_sd_init                ; initialise the SD card
-
     ldx #BOOTLOADER_BASE           ; destination address
     lda #$0000                     ; block number high
     ldy #$0000                     ; block number low
@@ -49,14 +50,16 @@ boot_from_sd:
     jmp BOOTLOADER_BASE
 
 boot_fail:
-    ; Halt
     ldx #halt_message
-    jsr uart_printz
+    cop ROM_PRINT_STRING
+    ldx #halt_message_2
+    cop ROM_PRINT_STRING
     stp
 
 rom_message:                       ; ASCII art startup message with ROM revision.
 .byte $1b
-.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 10          |\r\n+---------------------------------+\r\n"
-halt_message: .asciiz "No boot options remaining. Halted\r\n"
+.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 11          |\r\n+---------------------------------+\r\n"
+halt_message: .asciiz "No boot options remaining.\r\n"
+halt_message_2: .asciiz "Halted\r\n"
 boot_prompt: .asciiz "Boot from SD card? (y/N) "
 newline: .asciiz "\r\n"
