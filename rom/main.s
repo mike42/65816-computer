@@ -25,7 +25,7 @@ post_done:                         ; run some code
     jsr uart_printz
     stp
 
-rom_message:
+rom_message:                       ; ASCII art startup message with ROM revision.
 .byte $1b
-.asciiz "[2JROM revision 6.\r\n"
+.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 9          |\r\n+---------------------------------+\r\n"
 halt_message: .asciiz "Halted\r\n"
