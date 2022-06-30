@@ -1,7 +1,13 @@
 ; interrupt.s: Handling of software interrupts, the interface into the ROM for
 ; software (eg. bootloaders)
+;
+; Usage: Set registers and use 'cop' to trigger software interrupt.
+; Eg:
+;   ldx #'a'
+;   cop ROM_PRINT_CHAR
+; CPU should be in native mode with all registers 16-bit.
 
-.import uart_printz
+.import uart_printz, uart_print_char
 .export cop_handler
 .export ROM_PRINT_CHAR, ROM_READ_CHAR, ROM_PRINT_STRING, ROM_READ_DISK
 
@@ -9,41 +15,114 @@
 ; Print one ASCII char.
 ;   A is char to print
 ROM_PRINT_CHAR   := $00
+
 ; Read one ASCII char.
 ;   Returns typed character in A register
 ROM_READ_CHAR    := $01
+
 ; Print a null-terminated ASCII string.
 ;   X is address of string, use data bank register for addresses outside bank 0.
-ROM_PRINT_STRING := $fe
+ROM_PRINT_STRING := $02
+
 ; Read data from disk to RAM in 512 byte blocks.
 ;   X is address to write to, use data bank register for addresses outside bank 0.
 ;   A is high 2 bytes of block number
-;   Y is low 2 bytes of block number
-;   Number of blocks to read is read from the stack (2 bytes)
+;   Y is number of blocks to read
 ROM_READ_DISK    := $03
 
 .segment "CODE"
+; table of routines
+cop_routines:
+.word rom_print_char_handler
+.word rom_read_char_hanlder
+.word rom_print_string_handler
+.word rom_read_disk_handler
+
 cop_handler:
     .a16                           ; use 16-bit accumulator and index registers
     .i16
     rep #%00110000
-    ; Save task context to stack
+    ; Save caller context to stack
     pha                            ; Push A, X, Y
     phx
     phy
     phb                            ; Push data bank, direct register
     phd
-    tsc                            ; set direct register to equal stack pointer
+    ; Set up stack frame for COP handler
+    tsc                            ; WIP set direct register to equal stack pointer
+    sec
+    sbc  #cop_handler_local_vars_size
+    tcs
+    phd
     tcd
+caller_k := 15
+caller_ret := 13
+caller_p := 12
+caller_a := 10
+caller_x := 8
+caller_y := 6
+caller_b := 5
+caller_d := 3
+cop_call_addr := 0
+    ; set up 24 bit pointer to COP instruction
+    ldx <frame_base+caller_ret
+    dex
+    dex
+    stx <frame_base+cop_call_addr
+    .a8                       ; Use 8-bit accumulator
+    sep #%00100000
+    lda <frame_base+caller_k
+    sta <frame_base+cop_call_addr+2
+    .a16                      ; Revert to 16-bit accumulator
+    rep #%00100000
 
-    ; TODO read byte before return address to find which function is being called
-    ldx $06                        ; saved X register from before
-    jsr uart_printz
+    ; load COP instruction which triggered this interrupt to figure out routine to run
+    lda [<frame_base+cop_call_addr]
+    xba                             ; interested only in second byte
+    and #%00000011                  ; mask down to final two bits (there are only 4 valid function)
+    asl                             ; multiply by 2 to index into table of routines
+    tax
+    jsr (cop_routines, X)
 
-    ; Restore process context from stack, reverse order
+    ; Remove stack frame for COP handler
+    pld
+    tsc
+    clc
+    adc  #cop_handler_local_vars_size
+    tcs
+
+    ; Restore caller context from stack, reverse order
     pld                             ; Pull direct register, data bank
     plb
     ply                             ; Pull Y, X, A
     plx
     pla
     rti
+
+cop_handler_local_vars_size := 3
+frame_base := 1
+
+rom_print_char_handler:
+    ldx #aa
+    jsr uart_printz
+    rts
+
+rom_read_char_hanlder:
+    ldx #bb
+    jsr uart_printz
+    rts
+
+rom_print_string_handler:
+    ; Print string from X register
+    ldx <frame_base+caller_x
+    jsr uart_printz
+    rts
+
+rom_read_disk_handler:
+    ldx #cc
+    jsr uart_printz
+    rts
+
+aa: .asciiz "Not implemented A\r\n"
+bb: .asciiz "Not implemented B\r\n"
+cc: .asciiz "Not implemented C\r\n"
