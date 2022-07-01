@@ -39,19 +39,19 @@ cop_routines:
 .word rom_read_disk_handler
 
 cop_handler:
-    .a16                           ; use 16-bit accumulator and index registers
+    .a16                            ; use 16-bit accumulator and index registers
     .i16
     rep #%00110000
     ; Save caller context to stack
-    pha                            ; Push A, X, Y
+    pha                             ; Push A, X, Y
     phx
     phy
-    phb                            ; Push data bank, direct register
+    phb                             ; Push data bank, direct register
     phd
     ; Set up stack frame for COP handler
-    tsc                            ; WIP set direct register to equal stack pointer
+    tsc                             ; WIP set direct register to equal stack pointer
     sec
-    sbc  #cop_handler_local_vars_size
+    sbc #cop_handler_local_vars_size
     tcs
     phd
     tcd
@@ -69,11 +69,11 @@ cop_call_addr := 0
     dex
     dex
     stx <frame_base+cop_call_addr
-    .a8                       ; Use 8-bit accumulator
+    .a8                             ; Use 8-bit accumulator
     sep #%00100000
     lda <frame_base+caller_k
     sta <frame_base+cop_call_addr+2
-    .a16                      ; Revert to 16-bit accumulator
+    .a16                            ; Revert to 16-bit accumulator
     rep #%00100000
 
     ; load COP instruction which triggered this interrupt to figure out routine to run
@@ -88,7 +88,7 @@ cop_call_addr := 0
     pld
     tsc
     clc
-    adc  #cop_handler_local_vars_size
+    adc #cop_handler_local_vars_size
     tcs
 
     ; Restore caller context from stack, reverse order
