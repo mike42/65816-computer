@@ -15,6 +15,7 @@ This is a learning project, and I am blogging about it as I progress.
 - [Building an emulator for my 65C816 computer](https://mike42.me/blog/2022-04-building-an-emulator-for-my-65c816-computer)
 - [65C816 computer - second prototype](https://mike42.me/blog/2022-05-65c816-computer-second-prototype)
 - [Building a 65C816 test board](https://mike42.me/blog/2022-06-building-a-65c816-test-board)
+- [Let’s implement power-on self test (POST)](https://mike42.me/blog/2022-06-lets-implement-power-on-self-test-post)
 
 ## Licenses & acknowledgement
 
