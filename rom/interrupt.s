@@ -7,7 +7,7 @@
 ;   cop ROM_PRINT_CHAR
 ; CPU should be in native mode with all registers 16-bit.
 
-.import uart_printz, uart_print_char
+.import uart_printz, uart_print_char, spi_sd_block_read
 .export cop_handler
 .export ROM_PRINT_CHAR, ROM_READ_CHAR, ROM_PRINT_STRING, ROM_READ_DISK
 
@@ -26,7 +26,7 @@ ROM_PRINT_STRING := $02
 
 ; Read data from disk to RAM in 512 byte blocks.
 ;   X is address to write to, use data bank register for addresses outside bank 0.
-;   A is high 2 bytes of block number
+;   A is low 2 bytes of block number
 ;   Y is number of blocks to read
 ROM_READ_DISK    := $03
 
@@ -79,7 +79,7 @@ cop_call_addr := 0
     ; load COP instruction which triggered this interrupt to figure out routine to run
     lda [<frame_base+cop_call_addr]
     xba                             ; interested only in second byte
-    and #%00000011                  ; mask down to final two bits (there are only 4 valid function)
+    and #%00000011                  ; mask down to final two bits (there are only 4 valid functions at the moment)
     asl                             ; multiply by 2 to index into table of routines
     tax
     jsr (cop_routines, X)
@@ -119,8 +119,10 @@ rom_print_string_handler:
     rts
 
 rom_read_disk_handler:
-    ldx #cc
-    jsr uart_printz
+    ldx <frame_base+caller_x        ; destination address
+    lda #$0000                      ; block number high
+    ldy <frame_base+caller_a        ; block number low
+    jsr spi_sd_block_read           ; read boot sector to RAM
     rts
 
 aa: .asciiz "Not implemented A\r\n"
