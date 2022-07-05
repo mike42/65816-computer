@@ -29,7 +29,7 @@ boot_from_sd:
     ldx #BOOTLOADER_BASE            ; destination address
     lda #0                          ; block number
     ldy #1                          ; number of blocks to read
-    cop ROM_READ_DISK
+    cop ROM_READ_DISK               ; read boot sector to RAM
     ; Hexdump the boot sector
     ldx #BOOTLOADER_BASE            ; source address
     jsr hexdump_memory_block

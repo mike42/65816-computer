@@ -14,13 +14,14 @@ CLK  = %00000010
 
 OUTPUT_PINS = CS | MOSI | CLK
 
+; Note that this is being converted to use local stack-allocated variables, where
+; the DP set to the stack pointer before calling.
 .segment "ZEROPAGE"
-string_ptr: .res 2                              ; Pointer for printing
-out_tmp:    .res 1                              ; Used for shifting bit out
-in_tmp:     .res 1                              ; Used when shifing bits in
-
-.segment "BSS"
-io_block_id:              .res 4
+nothing:     .res 1                              ; This will point to next available stack space, don't use
+string_ptr:  .res 2                              ; Pointer for printing
+out_tmp:     .res 1                              ; Used for shifting bit out
+in_tmp:      .res 1                              ; Used when shifing bits in
+io_block_id: .res 4                              ; Used for reading entire blocks
 
 .segment "CODE"
 spi_sd_init:                        ; prepare for use of SD card through 65C22 VIA

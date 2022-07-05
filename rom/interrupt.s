@@ -49,7 +49,7 @@ cop_handler:
     phb                             ; Push data bank, direct register
     phd
     ; Set up stack frame for COP handler
-    tsc                             ; WIP set direct register to equal stack pointer
+    tsc
     sec
     sbc #cop_handler_local_vars_size
     tcs
@@ -122,9 +122,44 @@ rom_print_string_handler:
 
 rom_read_disk_handler:
     ; read requested blocks from disk to RAM
-    ; TODO this wont currently work for multiple blocks, and assumes data bank address is in bank 0.
     ldx <frame_base+caller_x        ; destination address
     lda #$0000                      ; block number high
     ldy <frame_base+caller_a        ; block number low
     jsr spi_sd_block_read           ; read boot sector to RAM
+
+; TODO this wont currently work for multiple blocks, and assumes data bank address is in bank 0.
+; first attempt at fix below
+;    ldx <frame_base+caller_x        ; destination address
+;    lda #$0000                      ; block number high
+;    ldy <frame_base+caller_a        ; block number low
+;    phx
+;    pha
+;    phy
+;    jsr spi_sd_multiblock_read
     rts
+
+; WIP this does not work yet.
+spi_sd_multiblock_read:
+;    ; Set up stack frame
+;    tsc
+;    sec
+;    sbc #multiblock_read_local_vars_size
+;    tcs
+;    phd
+;    tcd
+;dest_address := 7
+;block_number_high := 5
+;block_number_low := 3
+;    ; do same work as before. Does not actually work with multiple blocks
+;    ldx <multiblock_read_local_vars_size+dest_address
+;    lda <multiblock_read_local_vars_size+block_number_high
+;    ldy <multiblock_read_local_vars_size+block_number_low
+;    jsr spi_sd_block_read
+;    ; Clean up stack frame
+;    pld
+;    tsc
+;    clc
+;    adc #multiblock_read_local_vars_size+6
+;    tcs
+;
+;multiblock_read_local_vars_size := 10
