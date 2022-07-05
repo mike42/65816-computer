@@ -7,7 +7,7 @@
 ;   cop ROM_PRINT_CHAR
 ; CPU should be in native mode with all registers 16-bit.
 
-.import uart_printz, uart_print_char, spi_sd_block_read
+.import uart_printz, uart_recv_char, uart_print_char, spi_sd_block_read
 .export cop_handler
 .export ROM_PRINT_CHAR, ROM_READ_CHAR, ROM_PRINT_STRING, ROM_READ_DISK
 
@@ -103,13 +103,15 @@ cop_handler_local_vars_size := 3
 frame_base := 1
 
 rom_print_char_handler:
-    ldx #aa
-    jsr uart_printz
+    ; Print char from A register
+    lda <frame_base+caller_a
+    jsr uart_print_char
     rts
 
 rom_read_char_hanlder:
-    ldx #bb
-    jsr uart_printz
+    ; Receive character, caller gets result in A register
+    jsr uart_recv_char
+    sta <frame_base+caller_a
     rts
 
 rom_print_string_handler:
@@ -119,12 +121,10 @@ rom_print_string_handler:
     rts
 
 rom_read_disk_handler:
+    ; read requested blocks from disk to RAM
+    ; TODO this wont currently work for multiple blocks, and assumes data bank address is in bank 0.
     ldx <frame_base+caller_x        ; destination address
     lda #$0000                      ; block number high
     ldy <frame_base+caller_a        ; block number low
     jsr spi_sd_block_read           ; read boot sector to RAM
     rts
-
-aa: .asciiz "Not implemented A\r\n"
-bb: .asciiz "Not implemented B\r\n"
-cc: .asciiz "Not implemented C\r\n"
