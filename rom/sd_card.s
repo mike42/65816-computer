@@ -51,7 +51,7 @@ via_setup:
 sd_reset:
     .a16                            ; assume 16-bit accumulator and index registers
     .i16
-    jsr spi_nothing_byte            ; 80 cycles with MOSI and CS high.
+    jsr spi_nothing_byte            ; >80 cycles with MOSI and CS high.
     jsr spi_nothing_byte
     jsr spi_nothing_byte
     jsr spi_nothing_byte
@@ -63,19 +63,19 @@ sd_reset:
     jsr spi_nothing_byte
     jsr sd_cmd_go_idle_state
     cmp #$01                        ; Check for idle state
-    bne @sd_reset_fail
+    bne @sd_reset_fail1
     jsr sd_cmd_send_if_cond
     cmp #01                         ; Expect command to be supported, indicating 2.x SD card.
-    bne @sd_reset_fail
+    bne @sd_reset_fail2
     jsr sd_cmd_read_ocr             ; Do not care about response here, but expect it to be supported
     cmp #$01
-    bne @sd_reset_fail
+    bne @sd_reset_fail3
     jsr sd_cmd_app_cmd              ; Send app command to activiate initialisation process
     cmp #$01
-    bne @sd_reset_fail
+    bne @sd_reset_fail4
     jsr sd_acmd_sd_send_op_cond
     cmp #$01                        ; Expect initialisation in progress.
-    bne @sd_reset_fail
+    bne @sd_reset_fail5
     ldx #20                         ; max attempts
 @reset_wait:                        ; Repeat last step until initialisation is complete
     phx
@@ -87,11 +87,24 @@ sd_reset:
     dex
     cpx #0                          ; max attempts exceeded
     bne @reset_wait                 ; repeat up to maximum, falls through to failure otherwise
-@sd_reset_fail:
-    jmp reset_fail
-
+@sd_reset_fail1:
+    lda #1
+    rts
+@sd_reset_fail2:
+    lda #2
+    rts
+@sd_reset_fail3:
+    lda #3
+    rts
+@sd_reset_fail4:
+    lda #4
+    rts
+@sd_reset_fail5:
+    lda #5
+    rts
 @sd_reset_init_ok:
     jsr sd_cmd_read_ocr             ; TODO read response bit here for CCS
+    lda #0
     rts
 
 ; send SD card CMD0
@@ -406,16 +419,6 @@ sd_byte_send:                       ; Send the byte stored in the A register
     lda in_tmp
     plp
     rts
-
-reset_fail:
-    .a16                            ; use 16-bit accumulator and index registers
-    .i16
-    rep #%00110000
-    ldx #string_sd_reset_fail
-    jsr uart_printz
-    stp
-
-string_sd_reset_fail: .asciiz "SD card reset failed"
 
 hexdump_page:
     .a8                             ; assume 8-bit accumulator and index registers

@@ -121,45 +121,51 @@ rom_print_string_handler:
     rts
 
 rom_read_disk_handler:
-    ; read requested blocks from disk to RAM
-    ldx <frame_base+caller_x        ; destination address
-    lda #$0000                      ; block number high
-    ldy <frame_base+caller_a        ; block number low
-    jsr spi_sd_block_read           ; read boot sector to RAM
-
-; TODO this wont currently work for multiple blocks, and assumes data bank address is in bank 0.
-; first attempt at fix below
-;    ldx <frame_base+caller_x        ; destination address
-;    lda #$0000                      ; block number high
-;    ldy <frame_base+caller_a        ; block number low
-;    phx
-;    pha
-;    phy
-;    jsr spi_sd_multiblock_read
+    ; push arguments, right to left
+    lda <frame_base+caller_y        ;   Y is number of blocks to read
+    pha
+    lda <frame_base+caller_a        ;   A is low 2 bytes of block number
+    pha
+    lda <frame_base+caller_x        ;   X is address to write to, use data bank register for addresses outside bank 0.
+    pha
+    jsr spi_sd_multiblock_read
     rts
 
-; WIP this does not work yet.
 spi_sd_multiblock_read:
-;    ; Set up stack frame
-;    tsc
-;    sec
-;    sbc #multiblock_read_local_vars_size
-;    tcs
-;    phd
-;    tcd
-;dest_address := 7
-;block_number_high := 5
-;block_number_low := 3
-;    ; do same work as before. Does not actually work with multiple blocks
-;    ldx <multiblock_read_local_vars_size+dest_address
-;    lda <multiblock_read_local_vars_size+block_number_high
-;    ldy <multiblock_read_local_vars_size+block_number_low
-;    jsr spi_sd_block_read
-;    ; Clean up stack frame
-;    pld
-;    tsc
-;    clc
-;    adc #multiblock_read_local_vars_size+6
-;    tcs
-;
-;multiblock_read_local_vars_size := 10
+    .a16
+    .i16
+    tsc
+    sec
+    sbc #L2
+    tcs
+    phd
+    tcd
+dest_address_0 := 3
+block_number_low_1 := 5
+block_count_2 := 7
+@next_block:
+    ldx <L2+block_count_2
+    cpx #0
+    beq L4
+    ; Read one block of data
+    ldx <L2+dest_address_0          ; destination address
+    lda #0                          ; block number high
+    ldy <L2+block_number_low_1      ; block number low
+    jsr spi_sd_block_read           ; Read block to RAM
+    dec <L2+block_count_2           ; Decrement number of blocks remaining
+    lda <L2+dest_address_0          ; Wind dest address forward 512 bytes
+    clc
+    adc #512
+    sta <L2+dest_address_0
+    jmp @next_block
+L4:
+    lda <L2+1
+    sta <L2+1+6
+    pld
+    tsc
+    clc
+    adc #L2+6
+    tcs
+    rts
+L2	:=	10
+L3	:=	1

@@ -21,11 +21,31 @@ post_done:                          ; POST passed, time to run some code
     ldx #rom_message
     cop ROM_PRINT_STRING
     ; Current boot order
+    jsr sd_init_multiple_attempts   ; attempt SD card init
+    cmp #0
+    bne @boot_no_sd
     jsr boot_from_sd
+@boot_no_sd:                        ; no SD card or boot from SD declined
     jsr boot_fail
 
+; attempt to reset SD card up to 3 times - first attempt will often fail from a cold start
+sd_init_multiple_attempts:
+    jsr spi_sd_init                 ; attempt 1
+    cmp #0
+    beq @sd_init_ok
+    jsr spi_sd_init                 ; attempt 2
+    cmp #0
+    beq @sd_init_ok
+    jsr spi_sd_init                 ; attempt 3
+    cmp #0
+    beq @sd_init_ok
+    ldx #string_sd_reset_fail
+    cop ROM_PRINT_STRING
+    lda #1                          ; return nonzero
+@sd_init_ok:
+    rts
+
 boot_from_sd:
-    jsr spi_sd_init                 ; initialise the SD card
     ldx #BOOTLOADER_BASE            ; destination address
     lda #0                          ; block number
     ldy #1                          ; number of blocks to read
@@ -56,7 +76,8 @@ boot_fail:
 
 rom_message:                        ; ASCII art startup message with ROM revision.
 .byte $1b
-.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 13         |\r\n+---------------------------------+\r\n"
+.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 14         |\r\n+---------------------------------+\r\n"
 halt_message: .asciiz "No boot options remaining. Halted\r\n"
 boot_prompt: .asciiz "Boot from SD card? (y/N) "
+string_sd_reset_fail: .asciiz "SD card init failed\r\n"
 newline: .asciiz "\r\n"
