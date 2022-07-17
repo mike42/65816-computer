@@ -1,8 +1,14 @@
 EMULATOR=../emulator/cmake-build-debug/emulator
 
-.PHONY: kernel clean all
+.PHONY: bootloader kernel kernel_tmp clean all
 
-all: kernel ramfs.bin
+all: kernel disk.img
+
+bootloader:
+	make -C bootloader boot.bin
+	
+kernel_tmp:
+	make -C kernel_tmp kernel_tmp.bin
 
 kernel:
 	make -C kernel kernel.bin
@@ -10,9 +16,14 @@ kernel:
 ramfs.bin:
 	(cd ramfs && mkdir -p bin/ dev/ &&  python3 ../build_tools/ramfs.py --create --file ../ramfs.bin *)
 
+disk.img: bootloader kernel_tmp ramfs.bin
+	cat bootloader/boot.bin kernel_tmp/kernel_tmp.bin ramfs.bin > disk.img
+
 clean:
+	make -C bootloader clean
 	make -C kernel clean
-	rm ramfs.bin
+	make -C kernel_tmp clean
+	rm -f ramfs.bin disk.img
 
 run: kernel ramfs.bin
 	$(EMULATOR) kernel/kernel.bin ramfs.bin
