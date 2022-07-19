@@ -115,17 +115,17 @@ sd_cmd_go_idle_state:
     jsr sd_command_start
     ; Send command
     lda #%01000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%10010101
-    jsr sd_byte_send
+    jsr sd_byte_transfer
 
     jsr sd_first_byte_of_response
     pha                             ; This will be 01 if everything is OK.
@@ -141,28 +141,28 @@ sd_cmd_send_if_cond:
     ; Select chip
     jsr sd_command_start
     lda #%01001000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000001
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%10101010
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%10000111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
 
     jsr sd_first_byte_of_response
     pha                             ; This will be 01 if command is valid / everything is OK
     lda #%11111111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%11111111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%11111111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%11111111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     jsr sd_command_end
     pla                             ; Return first byte of response
     rts
@@ -173,32 +173,32 @@ sd_cmd_read_ocr:
     .i16
     jsr sd_command_start
     lda #%01111010
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%01110101
-    jsr sd_byte_send
+    jsr sd_byte_transfer
 
     lda #%11111111                  ; Fill
-    jsr sd_byte_send
+    jsr sd_byte_transfer
 
     lda #%11111111                  ; 5 byte response
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     pha
     lda #%11111111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%11111111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%11111111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%11111111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
 
     jsr sd_command_end
     pla
@@ -210,17 +210,17 @@ sd_cmd_app_cmd:
     .i16
     jsr sd_command_start
     lda #%01110111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%11111111                  ; Dummy CRC
-    jsr sd_byte_send
+    jsr sd_byte_transfer
 
     jsr sd_first_byte_of_response
     pha
@@ -235,17 +235,17 @@ sd_acmd_sd_send_op_cond:
     .i16
     jsr sd_command_start
     lda #%01101001
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%01000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%00000000
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%11111111                  ; Dummy CRC
-    jsr sd_byte_send
+    jsr sd_byte_transfer
 
     jsr sd_first_byte_of_response
     pha
@@ -279,19 +279,19 @@ sd_read_single_block:
 
     jsr sd_command_start
     lda #%01010001
-    jsr sd_byte_send
+    jsr sd_byte_transfer
 
     ; Send out 4-byte block ID, MSB first
     .a8                             ; Switch to 8-bit accumulator
     sep #%00100000
     lda io_block_id + 3
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda io_block_id + 2
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda io_block_id + 1
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda io_block_id
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     .a16                            ; Switch back to 16-bit accumulator
     rep #%00100000
 
@@ -304,8 +304,7 @@ sd_read_single_block:
     ldy #$00
     phy
 @sd_read_page_next_byte:
-    lda #%11111111                  ; fill byte
-    jsr sd_byte_send
+    jsr sd_byte_recv
     ; Write one byte at a time
     .a8                             ; Switch to 8-bit accumulator to save byte
     sep #%00100000
@@ -320,12 +319,43 @@ sd_read_single_block:
     jmp @sd_read_page_next_byte
 @sd_read_block_done:                ; Done reading block
     lda #%11111111                  ; 16 byte CRC (ignored).
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     lda #%11111111
-    jsr sd_byte_send
+    jsr sd_byte_transfer
 @sd_read_single_block_fail:
     jsr sd_command_end
 
+    rts
+
+sd_byte_recv:                       ; Receive byte to A register (fill byte $ff is sent)
+    php
+    .a8                             ; use 8-bit accumulator and index registers. TODO make this 16-bit
+    .i8
+    sep #%00110000
+    ldx #8
+    stz in_tmp
+@sd_recv_bit:                       ; Loop to receive one bit
+    asl in_tmp
+    lda #MOSI                       ; Send a 1
+    sta VIA_PORTA
+    lda #(MOSI | CLK)
+    sta VIA_PORTA
+    lda VIA_PORTA                   ; Check received bit
+    and #MISO
+    cmp #MISO
+    beq @sd_recv_1
+@sd_recv_0:                         ; Received a 0 - nothing to do.
+    jmp @sd_recv_done
+@sd_recv_1:                         ; Received a 1
+    lda in_tmp
+    ora #%00000001
+    sta in_tmp
+@sd_recv_done:
+    dex
+    cpx #0
+    bne @sd_recv_bit                ; Repeat until all 8 bits are sent
+    lda in_tmp
+    plp
     rts
 
 ; Send $ff to the SD card, return the first non-fill byte we get back in the A register.
@@ -337,7 +367,7 @@ sd_first_byte_of_response:
 @spi_consume_fill_byte:
     lda #%11111111                  ; Fill
     phx                             ; Preserve X, send the byte
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     plx
     cmp #%11111111                  ; Empty response?
     bne @spi_consume_fill_bytes_done
@@ -352,12 +382,12 @@ sd_command_start:
     .i16
     jsr spi_nothing_byte            ; Send 8 bits of nothing without SD selected
     lda #%11111111                  ; Send 8 bits of nothing w/ SD selected
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     rts
 
 sd_command_end:
     lda #%11111111                  ; Send 8 bits of nothing w/ SD selected
-    jsr sd_byte_send
+    jsr sd_byte_transfer
     jsr spi_nothing_byte            ; Send 8 bits of nothing without SD selected
     rts
 
@@ -378,7 +408,7 @@ spi_nothing_byte:
     plp
     rts
 
-sd_byte_send:                       ; Send the byte stored in the A register
+sd_byte_transfer:                   ; Send the byte stored in the A register
     php
     .a8                             ; use 8-bit accumulator and index registers. TODO make this 16-bit
     .i8
