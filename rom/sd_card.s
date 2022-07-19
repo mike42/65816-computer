@@ -262,20 +262,20 @@ sd_read_single_block:
     sta io_block_id + 2
     stx string_ptr
 
-    ; clear the memory to help with debugging
-    ldy #0
-@clear_memory_next:
-    .a8                             ; Switch to 8-bit accumulator to save byte
-    sep #%00100000
-    lda #$ea
-    sta (string_ptr), Y
-    .a16                            ; Switch back to 16-bit accumulator
-    rep #%00100000
-    cpy #$01ff                      ; Repeat for Y = 0 ... 511
-    beq @clear_memory_done
-    iny
-    jmp @clear_memory_next
-@clear_memory_done:
+;    ; clear the memory to help with debugging
+;    ldy #0
+;@clear_memory_next:
+;    .a8                             ; Switch to 8-bit accumulator to save byte
+;    sep #%00100000
+;    lda #$ea
+;    sta (string_ptr), Y
+;    .a16                            ; Switch back to 16-bit accumulator
+;    rep #%00100000
+;    cpy #$01ff                      ; Repeat for Y = 0 ... 511
+;    beq @clear_memory_done
+;    iny
+;    jmp @clear_memory_next
+;@clear_memory_done:
 
     jsr sd_command_start
     lda #%01010001
@@ -302,24 +302,30 @@ sd_read_single_block:
     cmp #$fe                        ; Start of block
     bne @sd_read_single_block_fail
     ldy #$00
+    .a8                             ; Switch to 8-bit accumulator for receiving bytes
+    sep #%00100000
 @sd_read_page_next_byte:
     ; Write one byte at a time
-    .a8                             ; Switch to 8-bit accumulator to save byte
-    sep #%00100000
     jsr __sd_byte_fast_recv
-    .a16                            ; Switch back to 16-bit accumulator
-    rep #%00100000
     cpy #$01ff                      ; Repeat for Y = 0 ... 511
     beq @sd_read_block_done
     iny
     jmp @sd_read_page_next_byte
 @sd_read_block_done:                ; Done reading block
+    .a16                            ; Switch back to 16-bit accumulator
+    rep #%00100000
     lda #%11111111                  ; 16 byte CRC (ignored).
     jsr sd_byte_transfer
     lda #%11111111
     jsr sd_byte_transfer
-@sd_read_single_block_fail:
     jsr sd_command_end
+    lda #512
+    rts
+@sd_read_single_block_fail:
+    .a16                            ; Switch back to 16-bit accumulator
+    rep #%00100000
+    jsr sd_command_end
+    lda #0
     rts
 
 __sd_byte_fast_recv:                ; Receive byte to A register (fill byte $ff is sent)
@@ -336,9 +342,7 @@ __sd_byte_fast_recv:                ; Receive byte to A register (fill byte $ff 
     lda VIA_PORTA                   ; Check received bit
     and #MISO
     cmp #MISO
-    beq @sd_recv_1
-@sd_recv_0:                         ; Received a 0 - nothing to do.
-    jmp @sd_recv_done
+    bne @sd_recv_done
 @sd_recv_1:                         ; Received a 1
     lda in_tmp
     ora #%00000001

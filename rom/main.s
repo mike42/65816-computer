@@ -29,16 +29,18 @@ post_done:                          ; POST passed, time to run some code
     jsr boot_fail
 
 ; attempt to reset SD card up to 3 times - first attempt will often fail from a cold start
+MAX_ATTEMPTS := 3
 sd_init_multiple_attempts:
-    jsr spi_sd_init                 ; attempt 1
+    ldx #0
+@sd_init_again:
+    phx
+    jsr spi_sd_init                 ; attempt SD reset
+    plx
     cmp #0
     beq @sd_init_ok
-    jsr spi_sd_init                 ; attempt 2
-    cmp #0
-    beq @sd_init_ok
-    jsr spi_sd_init                 ; attempt 3
-    cmp #0
-    beq @sd_init_ok
+    inx
+    cpx #MAX_ATTEMPTS               ; compare to max attempts
+    bne @sd_init_again
     ldx #string_sd_reset_fail
     cop ROM_PRINT_STRING
     lda #1                          ; return nonzero
