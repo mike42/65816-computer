@@ -262,21 +262,6 @@ sd_read_single_block:
     sta io_block_id + 2
     stx string_ptr
 
-;    ; clear the memory to help with debugging
-;    ldy #0
-;@clear_memory_next:
-;    .a8                             ; Switch to 8-bit accumulator to save byte
-;    sep #%00100000
-;    lda #$ea
-;    sta (string_ptr), Y
-;    .a16                            ; Switch back to 16-bit accumulator
-;    rep #%00100000
-;    cpy #$01ff                      ; Repeat for Y = 0 ... 511
-;    beq @clear_memory_done
-;    iny
-;    jmp @clear_memory_next
-;@clear_memory_done:
-
     jsr sd_command_start
     lda #%01010001
     jsr sd_byte_transfer
@@ -331,29 +316,28 @@ sd_read_single_block:
 __sd_byte_fast_recv:                ; Receive byte to A register (fill byte $ff is sent)
     .a8                             ; assume 8-bit accumulator and 16-bit index registers.
     .i16
-    ldx #8
-    stz in_tmp
+    lda #%00000001                  ; this 1 will trigger carry when shifted out
 @sd_recv_bit:                       ; Loop to receive one bit
-    asl in_tmp
+    sta in_tmp
     lda #MOSI                       ; Send a 1
     sta VIA_PORTA
     lda #(MOSI | CLK)
     sta VIA_PORTA
-    lda VIA_PORTA                   ; Check received bit
-    and #MISO
-    cmp #MISO
-    bne @sd_recv_done
-@sd_recv_1:                         ; Received a 1
+    lda VIA_PORTA                   ; Check received bit (MISO is final bit)
+    lsr
+    bcs @sd_recv_bit_1
+@sd_recv_bit_0:
+    lda in_tmp                      ; Received a 0
+    asl                             ; Rotate in a 0 - left shift
+    bcc @sd_recv_bit                ; Repeat unless a 1 is carried out (end of byte)
+    jmp @sd_recv_bit_done
+@sd_recv_bit_1:
     lda in_tmp
-    ora #%00000001
-    sta in_tmp
-@sd_recv_done:
-    dex
-    cpx #0
-    bne @sd_recv_bit                ; Repeat until all 8 bits are sent
-
-    lda in_tmp                      ; save to buffer
-    sta (string_ptr), Y
+    sec                             ; Rotate in a 1 - rotate left with carry set
+    rol
+    bcc @sd_recv_bit                ; Repeat unless a 1 is carried out (end of byte)
+@sd_recv_bit_done:
+    sta (string_ptr), Y             ; save to buffer
     rts
 
 ; Send $ff to the SD card, return the first non-fill byte we get back in the A register.
