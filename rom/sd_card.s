@@ -302,20 +302,16 @@ sd_read_single_block:
     cmp #$fe                        ; Start of block
     bne @sd_read_single_block_fail
     ldy #$00
-    phy
 @sd_read_page_next_byte:
-    jsr sd_byte_recv
     ; Write one byte at a time
     .a8                             ; Switch to 8-bit accumulator to save byte
     sep #%00100000
-    ply
-    sta (string_ptr), Y
+    jsr __sd_byte_fast_recv
     .a16                            ; Switch back to 16-bit accumulator
     rep #%00100000
     cpy #$01ff                      ; Repeat for Y = 0 ... 511
     beq @sd_read_block_done
     iny
-    phy
     jmp @sd_read_page_next_byte
 @sd_read_block_done:                ; Done reading block
     lda #%11111111                  ; 16 byte CRC (ignored).
@@ -324,14 +320,11 @@ sd_read_single_block:
     jsr sd_byte_transfer
 @sd_read_single_block_fail:
     jsr sd_command_end
-
     rts
 
-sd_byte_recv:                       ; Receive byte to A register (fill byte $ff is sent)
-    php
-    .a8                             ; use 8-bit accumulator and index registers. TODO make this 16-bit
-    .i8
-    sep #%00110000
+__sd_byte_fast_recv:                ; Receive byte to A register (fill byte $ff is sent)
+    .a8                             ; assume 8-bit accumulator and 16-bit index registers.
+    .i16
     ldx #8
     stz in_tmp
 @sd_recv_bit:                       ; Loop to receive one bit
@@ -354,8 +347,9 @@ sd_byte_recv:                       ; Receive byte to A register (fill byte $ff 
     dex
     cpx #0
     bne @sd_recv_bit                ; Repeat until all 8 bits are sent
-    lda in_tmp
-    plp
+
+    lda in_tmp                      ; save to buffer
+    sta (string_ptr), Y
     rts
 
 ; Send $ff to the SD card, return the first non-fill byte we get back in the A register.
