@@ -317,26 +317,17 @@ __sd_byte_fast_recv:                ; Receive byte to A register (fill byte $ff 
     .a8                             ; assume 8-bit accumulator and 16-bit index registers.
     .i16
     lda #%00000001                  ; this 1 will trigger carry when shifted out
-@sd_recv_bit:                       ; Loop to receive one bit
     sta in_tmp
+@sd_recv_bit:                       ; Loop to receive one bit
     lda #MOSI                       ; Send a 1
     sta VIA_PORTA
     lda #(MOSI | CLK)
     sta VIA_PORTA
     lda VIA_PORTA                   ; Check received bit (MISO is final bit)
-    lsr
-    bcs @sd_recv_bit_1
-@sd_recv_bit_0:
-    lda in_tmp                      ; Received a 0
-    asl                             ; Rotate in a 0 - left shift
+    lsr                             ; Received bit to carry flag
+    rol in_tmp                      ; Carry flag to in_tmp
     bcc @sd_recv_bit                ; Repeat unless a 1 is carried out (end of byte)
-    jmp @sd_recv_bit_done
-@sd_recv_bit_1:
     lda in_tmp
-    sec                             ; Rotate in a 1 - rotate left with carry set
-    rol
-    bcc @sd_recv_bit                ; Repeat unless a 1 is carried out (end of byte)
-@sd_recv_bit_done:
     sta (string_ptr), Y             ; save to buffer
     rts
 
