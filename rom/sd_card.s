@@ -424,8 +424,8 @@ sd_byte_transfer:                   ; Send the byte stored in the A register
     rts
 
 hexdump_page:
-    .a8                             ; assume 8-bit accumulator and index registers
-    .i8
+    .a8                             ; assume 8-bit accumulator and 16-bit index registers
+    .i16
     ; Hexdump one page of data, pointed to by string_ptr
     ldx #16
 @hexdump_page_next_line:
@@ -440,14 +440,17 @@ hexdump_page:
     rts
 
 ; Given address in string_ptr, prints a line. Eg.
-; 0c00  67 67 67 67 67 67 67 67  67 67 67 67 67 67 67 67  |gggggggggggggggg|
+; 000c00  67 67 67 67 67 67 67 67  67 67 67 67 67 67 67 67  |gggggggggggggggg|
 hexdump_line:
-    .a8                             ; assume 8-bit accumulator and index registers
-    .i8
+    .a8                             ; assume 8-bit accumulator and 16-bit index registers
+    .i16
     ; Print memory address first
-    lda string_ptr + 1              ;  High byte
+    phb                             ; Bank byte
+    pla
     jsr hex_print_byte
-    lda string_ptr                  ;  Low byte
+    lda string_ptr + 1              ; High byte
+    jsr hex_print_byte
+    lda string_ptr                  ; Low byte
     jsr hex_print_byte
     lda #' '                        ; Two spaces
     jsr uart_print_char
@@ -473,8 +476,8 @@ hexdump_line:
     rts
 
 hexdump_line_hex:
-    .a8                             ; assume 8-bit accumulator and index registers
-    .i8
+    .a8                             ; assume 8-bit accumulator and 16-bit index registers
+    .i16
     ; Print line in hex
     ldy #0
 @hexdump_line_next_byte:
@@ -496,6 +499,8 @@ hexdump_line_hex:
     rts
 
 hexdump_line_ascii:
+    .a8                             ; assume 8-bit accumulator and 16-bit index registers
+    .i16
     ldy #0
 @hexdump_line_ascii_next_byte:
     lda (string_ptr), Y             ; Print byte as ASCII
@@ -515,8 +520,8 @@ hexdump_line_ascii:
     rts
 
 shell_newline:
-    .a8                             ; assume 8-bit accumulator and index registers
-    .i8
+    .a8                             ; assume 8-bit accumulator and 16-bit index registers
+    .i16
     lda #$0d
     jsr uart_print_char
     lda #$0a
@@ -524,8 +529,8 @@ shell_newline:
     rts
 
 hex_print_byte:                     ; print accumulator as two ascii digits (hex)
-    .a8                             ; assume 8-bit accumulator and index registers
-    .i8
+    .a8                             ; assume 8-bit accumulator and 16-bit index registers
+    .i16
     pha                             ; store byte for later
     lsr                             ; shift out lower nibble
     lsr
@@ -547,9 +552,8 @@ hexdump_memory_block:
     .i16
     stx string_ptr
     php
-    .a8                             ; use 8-bit accumulator and index registers. TODO TODO TODO continue with 16-bit
-    .i8
-    sep #%00110000
+    .a8                             ; Switch to 8-bit accumulator for per-byte work
+    sep #%00100000
     jsr hexdump_page
     jsr hexdump_page
     plp
