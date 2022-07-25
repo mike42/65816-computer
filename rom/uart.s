@@ -29,15 +29,15 @@ uart_init:
     sep #%00100000
 
     lda #$80                        ; Enable divisor latches
-    sta UART_LCR
+    sta f:UART_LCR
     lda #1                          ; Set divisior to 1 - on a 1.8432 MHZ XTAL1, this gets 115200bps.
-    sta UART_DLL
+    sta f:UART_DLL
     lda #0
-    sta UART_DLM
+    sta f:UART_DLM
     lda #%00010111                  ; Sets up 8-n-1
-    sta UART_LCR
+    sta f:UART_LCR
     lda #%00001111                  ; Enable FIFO, set DMA mode 1
-    sta UART_FCR
+    sta f:UART_FCR
     .a16                            ; Revert to 16-bit accumulator
     rep #%00100000
     rts
@@ -50,12 +50,12 @@ uart_print_char:
     sep #%00100000
     pha
 @uart_wait_for_ready:               ; wait until transmit register is empty
-    lda UART_LSR
+    lda f:UART_LSR
     and #%00100000
     cmp #%00100000
     bne @uart_wait_for_ready
     pla
-    sta UART_THR
+    sta f:UART_THR
     plp                             ; Revert to previous setting
     rts
 
@@ -80,11 +80,11 @@ uart_printz:
 uart_recv_char:
     .a8                             ; Use 8-bit accumulator
     sep #%00100000
-    lda UART_LSR
+    lda f:UART_LSR
     and #%00000001
     cmp #%00000001
     bne uart_recv_char
-    lda UART_RHR
+    lda f:UART_RHR
     .a16                            ; Revert to 16-bit accumulator
     rep #%00100000
     rts

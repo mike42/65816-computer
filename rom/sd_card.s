@@ -537,12 +537,12 @@ hex_print_byte:                     ; print accumulator as two ascii digits (hex
     lsr
     lsr
     tax
-    lda hex_chars, X                ; convert 0-15 to ascii char for hex digit
+    lda f:hex_chars, X                ; convert 0-15 to ascii char for hex digit
     jsr uart_print_char             ; print upper nibble
     pla                             ; retrieve byte again
     and #$0f                        ; mask out upper nibble
     tax
-    lda hex_chars, X                ; convert 0-15 to ascii char for hex digit
+    lda f:hex_chars, X                ; convert 0-15 to ascii char for hex digit
     jsr uart_print_char             ; print lower nibble
     rts
 hex_chars: .byte '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
