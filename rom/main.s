@@ -1,5 +1,5 @@
 ; main.s: ROM startup code
-.import BOOTLOADER_BASE, post_start, uart_init, spi_sd_init, hexdump_memory_block
+.import BOOTLOADER_BASE, post_start, uart_init, spi_sd_init, hexdump_memory_block, xmodem_recv
 
 .importzp ROM_PRINT_STRING, ROM_READ_CHAR, ROM_READ_DISK, ROM_PRINT_CHAR
 
@@ -84,7 +84,25 @@ boot_from_serial:
     cop ROM_PRINT_STRING
     rts
 @boot_from_serial_ok:
-    stp                             ; TODO, upload from modem to boot.
+; Work in progress code below
+    jsr xmodem_recv
+
+    ;  hexdump the received program
+    lda #$0101                      ; Set bank 1?
+    pha
+    plb
+    plb
+    ldx #$0000                      ; source address
+    jsr hexdump_memory_block
+    lda #$0000                      ; Revert to bank 0?
+    pha
+    plb
+    plb
+
+    ldx #newline
+    cop ROM_PRINT_STRING
+; Work in progress code end
+    jml $010000
     rts
 
 boot_fail:
@@ -94,7 +112,7 @@ boot_fail:
 
 rom_message:                        ; ASCII art startup message with ROM revision.
 .byte $1b
-.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 17         |\r\n+---------------------------------+\r\n"
+.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 18         |\r\n+---------------------------------+\r\n"
 halt_message: .asciiz "No boot options remaining. Halted\r\n"
 boot_prompt_sd: .asciiz "Boot from SD card? (y/N) "
 string_sd_reset_fail: .asciiz "SD card init failed\r\n"

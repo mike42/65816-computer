@@ -1,6 +1,6 @@
 ; uart.s: driver for NXP SC16C752 UART
 .import UART_BASE
-.export uart_init, uart_print_char, uart_recv_char, uart_printz
+.export uart_init, uart_print_char, uart_recv_char, uart_printz, uart_recv_char_with_timeout
 
 ; UART registers
 ; Not included: FIFO ready register, Xon1 Xon2 words.
@@ -49,11 +49,11 @@ uart_print_char:
     .a8                             ; Use 8-bit accumulator
     sep #%00100000
     pha
-@uart_wait_for_ready:               ; wait until transmit register is empty
+@uart_print_wait_for_ready:         ; wait until transmit register is empty
     lda f:UART_LSR
     and #%00100000
     cmp #%00100000
-    bne @uart_wait_for_ready
+    bne @uart_print_wait_for_ready
     pla
     sta f:UART_THR
     plp                             ; Revert to previous setting
@@ -62,6 +62,7 @@ uart_print_char:
 ; uart_printz: Print characters to UART until a null is reached
 ; X - pointer to string to print
 uart_printz:
+    php
     .a8                             ; Use 8-bit accumulator
     sep #%00100000
 @uart_printz_next:
@@ -72,19 +73,49 @@ uart_printz:
     inx
     jmp @uart_printz_next
 @uart_printz_done:
-    .a16                            ; Revert to 16-bit accumulator
-    rep #%00100000
+    plp                             ; Revert to previous setting
     rts
 
 ; uart_recv_char: Block until a character is received, then load result to A register.
 uart_recv_char:
+    php
     .a8                             ; Use 8-bit accumulator
     sep #%00100000
+@uart_recv_wait_for_ready:
     lda f:UART_LSR
     and #%00000001
     cmp #%00000001
-    bne uart_recv_char
+    bne @uart_recv_wait_for_ready
     lda f:UART_RHR
-    .a16                            ; Revert to 16-bit accumulator
-    rep #%00100000
+    plp                             ; Revert to previous setting
+    rts
+
+; uart_recv_char_with_timeout: Load any received character to A register and set carry bit. If no character is received
+; after a short/arbitrary delay, then this will return with A=0 and a clear carry bit.
+uart_recv_char_with_timeout:
+    php
+    .a8                             ; Switch to 16-bit index, 8-bit accumulator for per-byte work
+    .i16
+    sep #%00100000
+    rep #%00010000
+    ldx #$0004                      ; Tune outer loop $0000-$ffff to adjust timeout
+:   ldy #$ffff                      ; Inner loop
+:   lda f:UART_LSR                  ; Check for character
+    and #%00000001
+    cmp #%00000001
+    beq @uart_recv_got_char
+    dey                             ; Inner and outer loop
+    cpy #0
+    bne :-
+    dex
+    cpx #0
+    bne :--
+    lda #0                          ; Timeout here
+    plp                             ; Revert to previous setting
+    clc                             ; ... but clear carry bit
+    rts
+@uart_recv_got_char:                ; Character recieved here
+    lda f:UART_RHR
+    plp                             ; Revert to previous setting
+    sec                             ; ... but set carry bit
     rts
