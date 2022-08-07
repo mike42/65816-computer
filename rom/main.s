@@ -73,36 +73,30 @@ boot_from_sd:
     jmp BOOTLOADER_BASE
 
 boot_from_serial:
-    ldx #boot_prompt_serial
+    ldx #boot_prompt_serial         ; Ask if user wants to boot from serial
     cop ROM_PRINT_STRING
     cop ROM_READ_CHAR
     cmp #'y'
-    beq @boot_from_serial_ok
+    beq @boot_from_serial_selected
     cmp #'Y'
-    beq @boot_from_serial_ok
-    ldx #newline
+    beq @boot_from_serial_selected
+    ldx #newline                    ; Serial not selected
     cop ROM_PRINT_STRING
     rts
-@boot_from_serial_ok:
-; Work in progress code below
-    jsr xmodem_recv
-
-    ;  hexdump the received program
-    lda #$0101                      ; Set bank 1?
-    pha
-    plb
-    plb
-    ldx #$0000                      ; source address
-    jsr hexdump_memory_block
-    lda #$0000                      ; Revert to bank 0?
-    pha
-    plb
-    plb
-
-    ldx #newline
+@boot_from_serial_selected:
+    ldx #newline                    ; Serial is selected
     cop ROM_PRINT_STRING
-; Work in progress code end
-    jml $010000
+    jsr xmodem_recv                 ; Receive program over serial
+    cmp #0                          ; 0 is OK, nonzero means problem
+    bne @boot_from_serial_fail
+    ldx #start_of_line              ; move cursor back to start of line - some whitespace is printed by xmodem_recv
+    cop ROM_PRINT_STRING
+    jml $010000                     ; Run the uploaded program
+@boot_from_serial_fail:
+    ldx #start_of_line              ; move cursor back to start of line
+    cop ROM_PRINT_STRING
+    ldx #string_boot_serial_fail    ; Something went wrong with the transfer
+    cop ROM_PRINT_STRING
     rts
 
 boot_fail:
@@ -112,9 +106,13 @@ boot_fail:
 
 rom_message:                        ; ASCII art startup message with ROM revision.
 .byte $1b
-.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 18         |\r\n+---------------------------------+\r\n"
+.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 19         |\r\n+---------------------------------+\r\n"
 halt_message: .asciiz "No boot options remaining. Halted\r\n"
 boot_prompt_sd: .asciiz "Boot from SD card? (y/N) "
 string_sd_reset_fail: .asciiz "SD card init failed\r\n"
 boot_prompt_serial: .asciiz "Boot from serial (y/N) "
+string_boot_serial_fail: .asciiz "Serial transfer failed\r\n"
+start_of_line:
+.byte $1b
+.asciiz "[1G"
 newline: .asciiz "\r\n"

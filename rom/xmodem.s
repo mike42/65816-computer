@@ -74,19 +74,13 @@ xmodem_recv:
     lda #ASCII_ACK                  ; ACK the EOT as well.
     jsr uart_print_char
     jsr click                       ; Click each time we send a NAK or ACK
-
-
-    jsr uart_recv_char_with_timeout ; induce delay, printing anything to the terminal immediately will not work.
-
-    ; jsr shell_rx_print_user_program TODO
-    ; jsr shell_newline TODO would also be useful
-    lda #'!'
-    jsr uart_print_char
-
+    jsr uart_recv_char_with_timeout ; induce delay, printing to the terminal immediately will not work
+    lda #0                          ; set accumulator to 0.
+    xba                             ; set the other half to zero as well..
     lda #0
     jmp @shell_rx_cleanup
 @shell_rx_fail:
-    jsr uart_recv_char_with_timeout ; induce delay, printing anything to the terminal immediately will not work.
+    jsr uart_recv_char_with_timeout ; introduce delay, printing to the terminal immediately will not work.
     lda #1
 @shell_rx_cleanup:
     plb                             ; Restore previous data bank register
