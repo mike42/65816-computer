@@ -531,8 +531,6 @@ shell_newline:
 hex_print_byte:                     ; print accumulator as two ascii digits (hex)
     .a8                             ; assume 8-bit accumulator and 16-bit index registers
     .i16
-    ldx #0
-    clc
     pha                             ; store byte for later
     lsr                             ; shift out lower nibble
     lsr
@@ -543,33 +541,16 @@ hex_print_byte:                     ; print accumulator as two ascii digits (hex
     jsr hex_print_nibble
     rts
 
-; Note: Had some trouble getting this routine to work with absolute long indexed with X addressing, ie:
-;
-;   and #$0f
-;   tax                             ; A is 8 bit and X is 16-bit, is this the problem?
-;   lda f:hex_chars, X              ; works when data bank is 0, does not work when data bank is 1.
-;   jsr uart_print_char
-;   ...
-;   hex_chars: .byte '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-;
-; This monstrosity is a workaround so that we can hexdump things outside of bank 0 and get on to higher-level code.
-; Possibly related thread: https://cc65.github.io/mailarchive/2013-01/11059.html
 hex_print_nibble:                   ; print one hex digit using least significant 4 bits in the A register
     .a8                             ; assume 8-bit accumulator and 16-bit index registers
     .i16
-    and #$0f                        ; mask out upper nibble
-    cmp #$0a                        ; branch if greater than $09
-    bcs :+
-    adc #'0'                        ; convert 0-9 to ASCII value
-    jmp @hex_print_nibble_done
-:   cmp #$10                        ; branch if greater than $0f (should not happen, right?)
-    bcs :+
-    adc #('a' - $0a)                ; convert a-f to ASCII value
-    jmp @hex_print_nibble_done
-:   lda #'x'                        ; fallthrough, shouldn't happen but bugs are a thing.
-@hex_print_nibble_done:
-    jsr uart_print_char             ; print upper nibble
+    and #$0f
+    tax                             ; NB: this assumes B accumulator is 0
+    lda f:hex_chars, X              ; convert nibble in X to ASCII value. relies on code being in first bank
+    jsr uart_print_char
     rts
+
+hex_chars: .byte '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 
 hexdump_memory_block:
     php
@@ -578,6 +559,8 @@ hexdump_memory_block:
     sep #%00100000
     rep #%00010000
     stx string_ptr
+    lda #0                          ; zero out the B accumulator
+    xba
     jsr hexdump_page
     jsr hexdump_page
     plp

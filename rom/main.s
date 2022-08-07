@@ -25,7 +25,8 @@ post_done:                          ; POST passed, time to run some code
     cmp #0
     bne @boot_no_sd
     jsr boot_from_sd
-@boot_no_sd:                        ; no SD card or boot from SD declined
+@boot_no_sd:                        ; no SD card, or boot from SD declined
+    jsr boot_from_serial
     jsr boot_fail
 
 ; attempt to reset SD card up to 3 times - first attempt will often fail from a cold start
@@ -55,19 +56,8 @@ boot_from_sd:
     ; Hexdump the boot sector
     ldx #BOOTLOADER_BASE            ; source address
     jsr hexdump_memory_block
-    ; Hexdump same address but in bank 1 (not used yet, for testing hexdump only)
-;    lda #$0101                      ; Set bank 1?
-;    pha
-;    plb
-;    plb
-;    ldx #BOOTLOADER_BASE            ; source address
-;    jsr hexdump_memory_block
-;    lda #$0000                      ; Set bank 0?
-;    pha
-;    plb
-;    plb
     ; Prompt for whether to run the bootloader.
-    ldx #boot_prompt
+    ldx #boot_prompt_sd
     cop ROM_PRINT_STRING
     cop ROM_READ_CHAR
     cmp #'y'
@@ -82,6 +72,21 @@ boot_from_sd:
     cop ROM_PRINT_STRING
     jmp BOOTLOADER_BASE
 
+boot_from_serial:
+    ldx #boot_prompt_serial
+    cop ROM_PRINT_STRING
+    cop ROM_READ_CHAR
+    cmp #'y'
+    beq @boot_from_serial_ok
+    cmp #'Y'
+    beq @boot_from_serial_ok
+    ldx #newline
+    cop ROM_PRINT_STRING
+    rts
+@boot_from_serial_ok:
+    stp                             ; TODO, upload from modem to boot.
+    rts
+
 boot_fail:
     ldx #halt_message
     cop ROM_PRINT_STRING
@@ -89,8 +94,9 @@ boot_fail:
 
 rom_message:                        ; ASCII art startup message with ROM revision.
 .byte $1b
-.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 16         |\r\n+---------------------------------+\r\n"
+.asciiz "[2J+---------------------------------+\r\n|   __  ____   ____ ___  _  __    |\r\n|  / /_| ___| / ___( _ )/ |/ /_   |\r\n| | '_ \\___ \\| |   / _ \\| | '_ \\  |\r\n| | (_) |__) | |__| (_) | | (_) | |\r\n|  \\___/____/ \\____\\___/|_|\\___/  |\r\n|                                 |\r\n|         ROM revision 17         |\r\n+---------------------------------+\r\n"
 halt_message: .asciiz "No boot options remaining. Halted\r\n"
-boot_prompt: .asciiz "Boot from SD card? (y/N) "
+boot_prompt_sd: .asciiz "Boot from SD card? (y/N) "
 string_sd_reset_fail: .asciiz "SD card init failed\r\n"
+boot_prompt_serial: .asciiz "Boot from serial (y/N) "
 newline: .asciiz "\r\n"
