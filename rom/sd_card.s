@@ -41,9 +41,9 @@ via_setup:
     .i8
     sep #%00110000
     lda #(CS | MOSI)                ; CS and MOSI are high initially.
-    sta VIA_PORTA
+    sta f:VIA_PORTA
     lda #OUTPUT_PINS
-    sta VIA_DDRA
+    sta f:VIA_DDRA
     plp
     rts
 
@@ -320,10 +320,10 @@ __sd_byte_fast_recv:                ; Receive byte to A register (fill byte $ff 
     sta in_tmp
 @sd_recv_bit:                       ; Loop to receive one bit
     lda #MOSI                       ; Send a 1
-    sta VIA_PORTA
+    sta f:VIA_PORTA
     lda #(MOSI | CLK)
-    sta VIA_PORTA
-    lda VIA_PORTA                   ; Check received bit (MISO is final bit)
+    sta f:VIA_PORTA
+    lda f:VIA_PORTA                   ; Check received bit (MISO is final bit)
     lsr                             ; Received bit to carry flag
     rol in_tmp                      ; Carry flag to in_tmp
     bcc @sd_recv_bit                ; Repeat unless a 1 is carried out (end of byte)
@@ -372,9 +372,9 @@ spi_nothing_byte:
     ldx #8                          ; Send 8 bits of nothing, without SD selected
 @command_start_bit:
     lda #(MOSI | CS)
-    sta VIA_PORTA
+    sta f:VIA_PORTA
     lda #(CLK | MOSI | CS)
-    sta VIA_PORTA
+    sta f:VIA_PORTA
     dex
     cpx #0
     bne @command_start_bit
@@ -395,17 +395,17 @@ sd_byte_transfer:                   ; Send the byte stored in the A register
     bcs @sd_send_1
 @sd_send_0:                         ; Send a 0
     lda #0
-    sta VIA_PORTA
+    sta f:VIA_PORTA
     lda #CLK
-    sta VIA_PORTA
+    sta f:VIA_PORTA
     jmp @sd_send_bit_done
 @sd_send_1:                         ; Send a 1
     lda #MOSI
-    sta VIA_PORTA
+    sta f:VIA_PORTA
     lda #(MOSI | CLK)
-    sta VIA_PORTA
+    sta f:VIA_PORTA
 @sd_send_bit_done:                  ; Check received bit
-    lda VIA_PORTA
+    lda f:VIA_PORTA
     and #MISO
     cmp #MISO
     beq @sd_recv_1
