@@ -531,29 +531,53 @@ shell_newline:
 hex_print_byte:                     ; print accumulator as two ascii digits (hex)
     .a8                             ; assume 8-bit accumulator and 16-bit index registers
     .i16
+    ldx #0
+    clc
     pha                             ; store byte for later
     lsr                             ; shift out lower nibble
     lsr
     lsr
     lsr
-    tax
-    lda f:hex_chars, X                ; convert 0-15 to ascii char for hex digit
-    jsr uart_print_char             ; print upper nibble
+    jsr hex_print_nibble
     pla                             ; retrieve byte again
-    and #$0f                        ; mask out upper nibble
-    tax
-    lda f:hex_chars, X                ; convert 0-15 to ascii char for hex digit
-    jsr uart_print_char             ; print lower nibble
+    jsr hex_print_nibble
     rts
-hex_chars: .byte '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+
+; Note: Had some trouble getting this routine to work with absolute long indexed with X addressing, ie:
+;
+;   and #$0f
+;   tax                             ; A is 8 bit and X is 16-bit, is this the problem?
+;   lda f:hex_chars, X              ; works when data bank is 0, does not work when data bank is 1.
+;   jsr uart_print_char
+;   ...
+;   hex_chars: .byte '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+;
+; This monstrosity is a workaround so that we can hexdump things outside of bank 0 and get on to higher-level code.
+; Possibly related thread: https://cc65.github.io/mailarchive/2013-01/11059.html
+hex_print_nibble:                   ; print one hex digit using least significant 4 bits in the A register
+    .a8                             ; assume 8-bit accumulator and 16-bit index registers
+    .i16
+    and #$0f                        ; mask out upper nibble
+    cmp #$0a                        ; branch if greater than $09
+    bcs :+
+    adc #'0'                        ; convert 0-9 to ASCII value
+    jmp @hex_print_nibble_done
+:   cmp #$10                        ; branch if greater than $0f (should not happen, right?)
+    bcs :+
+    adc #('a' - $0a)                ; convert a-f to ASCII value
+    jmp @hex_print_nibble_done
+:   lda #'x'                        ; fallthrough, shouldn't happen but bugs are a thing.
+@hex_print_nibble_done:
+    jsr uart_print_char             ; print upper nibble
+    rts
 
 hexdump_memory_block:
-    .a16                            ; assume 16-bit accumulator and index registers
-    .i16
-    stx string_ptr
     php
-    .a8                             ; Switch to 8-bit accumulator for per-byte work
+    .a8                             ; Switch to 16-bit index, 8-bit accumulator for per-byte work
+    .i16
     sep #%00100000
+    rep #%00010000
+    stx string_ptr
     jsr hexdump_page
     jsr hexdump_page
     plp

@@ -55,6 +55,17 @@ boot_from_sd:
     ; Hexdump the boot sector
     ldx #BOOTLOADER_BASE            ; source address
     jsr hexdump_memory_block
+    ; Hexdump same address but in bank 1 (not used yet, for testing hexdump only)
+;    lda #$0101                      ; Set bank 1?
+;    pha
+;    plb
+;    plb
+;    ldx #BOOTLOADER_BASE            ; source address
+;    jsr hexdump_memory_block
+;    lda #$0000                      ; Set bank 0?
+;    pha
+;    plb
+;    plb
     ; Prompt for whether to run the bootloader.
     ldx #boot_prompt
     cop ROM_PRINT_STRING
