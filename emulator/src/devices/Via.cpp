@@ -9,6 +9,7 @@ const int IFR7 = 0x80;
 
 Via::Via() {
     state = {};
+    state.interruptEnableRegister = 0x80;
     interrupt = std::make_shared<InterruptStatus>();
 }
 
@@ -81,6 +82,8 @@ uint8_t Via::readByte(const Address &address) {
             return state.timer1Counter & 0xFF;
         case VIA_T1C_H:
             return (state.timer1Counter >> 8) & 0xFF;
+        case VIA_IER:
+            return state.interruptEnableRegister;
     }
     // TODO return values..
     return 0;
