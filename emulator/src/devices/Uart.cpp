@@ -52,7 +52,7 @@ uint8_t Uart::readByte(const Address &address) {
         }
         case UART_LSR:
             tryRead();
-            return state.charPending ? 0x01 : 0x00;
+            return state.charPending != 0x00 ? 0x21 : 0x20;
     }
     return 0;
 }
