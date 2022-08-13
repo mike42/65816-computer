@@ -47,7 +47,6 @@ void Cpu65816::executeJumpReturn(OpCode &opCode) {
         case (0xFC):  // JSR Absolute Indexed Indirect, X
         {
             Address destinationAddress = getAddressOfOpCodeData(opCode);
-            mStack.push8Bit(mProgramAddress.getBank());
             mStack.push16Bit(mProgramAddress.getOffset() + 2);
             setProgramAddress(destinationAddress);
             addToCycles(8);

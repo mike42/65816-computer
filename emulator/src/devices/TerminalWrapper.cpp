@@ -7,6 +7,8 @@ TerminalWrapper::TerminalWrapper() {
     tcgetattr(STDIN_FILENO, &attrs);
     attrs.c_lflag &= ~(ECHO); // No local echo, send characters one at a time
     attrs.c_lflag &= ~(ICANON);
+    attrs.c_cc[VMIN] = 0; // completely non-blocking read, see eg.
+    attrs.c_cc[VTIME] = 0; // https://stackoverflow.com/questions/25996171/linux-blocking-vs-non-blocking-serial-read
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &attrs);
 }
 
