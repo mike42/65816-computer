@@ -38,7 +38,8 @@ void Cpu65816::executeInterrupt(OpCode &opCode) {
 #ifdef EMU_65C02
                 mCpuStatus.clearDecimalFlag();
 #endif
-                setProgramAddress(Address(0x00, INTERRUPT_VECTOR_EMULATION_BRK_IRQ));
+                Address newAddress(0x00, mSystemBus.readTwoBytes(Address(0x00, INTERRUPT_VECTOR_EMULATION_BRK_IRQ)));
+                setProgramAddress(newAddress);
                 addToCycles(7);
             } else {
                 mStack.push8Bit(mProgramAddress.getBank());
@@ -46,7 +47,7 @@ void Cpu65816::executeInterrupt(OpCode &opCode) {
                 mStack.push8Bit(mCpuStatus.getRegisterValue());
                 mCpuStatus.setInterruptDisableFlag();
                 mCpuStatus.clearDecimalFlag();
-                Address newAddress(0x00, INTERRUPT_VECTOR_NATIVE_BRK);
+                Address newAddress(0x00, mSystemBus.readTwoBytes(Address(0x00, INTERRUPT_VECTOR_NATIVE_BRK)));
                 setProgramAddress(newAddress);
                 addToCycles(8);
             }
@@ -58,14 +59,16 @@ void Cpu65816::executeInterrupt(OpCode &opCode) {
                 mStack.push16Bit(static_cast<uint16_t>(mProgramAddress.getOffset() + 2));
                 mStack.push8Bit(mCpuStatus.getRegisterValue());
                 mCpuStatus.setInterruptDisableFlag();
-                setProgramAddress(Address(0x00, INTERRUPT_VECTOR_EMULATION_COP));
+                Address newAddress(0x00, mSystemBus.readTwoBytes(Address(0x00, INTERRUPT_VECTOR_EMULATION_COP)));
+                setProgramAddress(newAddress);
                 addToCycles(7);
             } else {
                 mStack.push8Bit(mProgramAddress.getBank());
                 mStack.push16Bit(static_cast<uint16_t>(mProgramAddress.getOffset() + 2));
                 mStack.push8Bit(mCpuStatus.getRegisterValue());
                 mCpuStatus.setInterruptDisableFlag();
-                setProgramAddress(Address(0x00, INTERRUPT_VECTOR_NATIVE_COP));
+                Address newAddress(0x00, mSystemBus.readTwoBytes(Address(0x00, INTERRUPT_VECTOR_NATIVE_COP)));
+                setProgramAddress(newAddress);
                 addToCycles(8);
             }
             mCpuStatus.clearDecimalFlag();
