@@ -102,15 +102,12 @@ void Cpu65816::executeStatusReg(OpCode &opCode) {
             if (oldEmulation) mCpuStatus.setCarryFlag();
             else mCpuStatus.clearCarryFlag();
 
-            mX &= 0xFF;
-            mY &= 0xFF;
-
             if (mCpuStatus.emulationFlag()) {
+                mA &= 0xFF;
+                mX &= 0xFF;
+                mY &= 0xFF;
                 mCpuStatus.setAccumulatorWidthFlag();
                 mCpuStatus.setIndexWidthFlag();
-            } else {
-                mCpuStatus.clearAccumulatorWidthFlag();
-                mCpuStatus.clearIndexWidthFlag();
             }
 
             // New stack
