@@ -12,6 +12,9 @@ public:
 
     virtual ~TerminalWrapper();
 
+private:
+    int sockfd;
+    int connfd;
 };
 
 
