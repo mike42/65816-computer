@@ -64,6 +64,8 @@ public:
     Stack *getStack();
     CpuStatus *getCpuStatus();
 
+    uint64_t getTotalCyclesCounter() const;
+
 private:
     SystemBus &mSystemBus;
 

@@ -1,4 +1,3 @@
-#include <cstdio>
 #include "Uart.h"
 
 void Uart::storeByte(const Address &address, uint8_t value) {
@@ -46,23 +45,30 @@ uint8_t Uart::readByte(const Address &address) {
     switch (reg) {
         case UART_RHR: {
             tryRead();
-            char ret = state.charPending;
-            state.charPending = 0x00;
-            return ret;
+            if(state.hasCharPending) {
+                uint8_t ret = state.charPending;
+                state.charPending = 0x00;
+                state.hasCharPending = false;
+                return ret;
+            } else {
+                return 0x00;
+            }
         }
         case UART_LSR:
             tryRead();
-            return state.charPending != 0x00 ? 0x21 : 0x20;
+            return state.hasCharPending? 0x21 : 0x20;
     }
     return 0;
 }
 
 void Uart::tryRead() {
-    if (state.charPending != 0x00) {
+    if(state.hasCharPending) {
         return;
     }
-    char res = terminal->readChar();
-    state.charPending = res;;
+    unsigned char resultChar;
+    bool hasChar =  terminal->readChar(resultChar);
+    state.hasCharPending = hasChar;
+    state.charPending = resultChar;
 }
 
 bool Uart::decodeAddress(const Address &in, Address &out) {

@@ -6,9 +6,9 @@ class TerminalWrapper {
 public:
     TerminalWrapper();
 
-    void writeChar(char charToWrite);
+    void writeChar(unsigned char charToWrite) const;
 
-    char readChar();
+    bool readChar(unsigned char &res);
 
     virtual ~TerminalWrapper();
 

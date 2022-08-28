@@ -4,6 +4,7 @@
 #include "Via.h"
 #include "Uart.h"
 #include "TerminalWrapper.h"
+#include "SpeedLimit.h"
 
 #include <SystemBus.h>
 #include <Cpu65816.h>
@@ -12,7 +13,7 @@
 #define LOG_TAG "MAIN"
 
 int main(int argc, char **argv) {
-    Log::vrb(LOG_TAG).str("+++ Lib65816 Sample Programs +++").show();
+    Log::vrb(LOG_TAG).str("+++ Program starting +++").show();
 
     Ram ram = Ram(16);
     std::string romFilename = argc > 1 ? argv[1] : "../rom/rom.bin";
@@ -48,9 +49,10 @@ int main(int argc, char **argv) {
         // Trigger clean exit when STP is used.
         breakPointHit = true;
     });
-
+    SpeedLimit speedLimit(4000000);
     while (!breakPointHit) {
         debugger.step();
+        speedLimit.apply(cpu.getTotalCyclesCounter());
     }
 
     debugger.dumpCpu();

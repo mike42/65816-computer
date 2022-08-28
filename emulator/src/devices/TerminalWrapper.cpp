@@ -41,17 +41,19 @@ TerminalWrapper::TerminalWrapper() {
 TerminalWrapper::~TerminalWrapper() {
 }
 
-void TerminalWrapper::writeChar(char ch) {
+void TerminalWrapper::writeChar(const unsigned char ch) const {
     if (connfd < 0) {
         return;
     }
     write(connfd, &ch, 1);
 }
 
-char TerminalWrapper::readChar() {
-    char c;
+bool TerminalWrapper::readChar(unsigned char &res) {
+    res = 0x00;
+    unsigned char c;
     if (read(connfd, &c, 1) == 1) {
-        return c;
+        res = c;
+        return true;
     }
-    return 0;
+    return false;
 }

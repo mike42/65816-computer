@@ -205,3 +205,7 @@ uint16_t Cpu65816::indexWithYRegister() {
 void Cpu65816::setProgramAddress(const Address &address) {
     mProgramAddress = address;
 }
+
+uint64_t Cpu65816::getTotalCyclesCounter() const {
+    return mTotalCyclesCounter;
+}

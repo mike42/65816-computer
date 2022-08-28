@@ -6,7 +6,8 @@
 
 struct UartState {
     uint8_t lineControlRegister;
-    char charPending;
+    unsigned char charPending;
+    bool hasCharPending;
 };
 
 /**

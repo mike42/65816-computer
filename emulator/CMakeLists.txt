@@ -50,7 +50,9 @@ add_executable(emulator
         src/devices/Via.cpp
         src/devices/InterruptStatus.cpp
         src/devices/Uart.cpp
-        src/devices/TerminalWrapper.cpp)
+        src/devices/TerminalWrapper.cpp
+        src/cpu/SpeedLimit.cpp
+        src/cpu/SpeedLimit.h)
 
 target_link_libraries(emulator)
 
