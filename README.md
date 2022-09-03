@@ -16,6 +16,7 @@ This is a learning project, and I am blogging about it as I progress.
 - [65C816 computer - second prototype](https://mike42.me/blog/2022-05-65c816-computer-second-prototype)
 - [Building a 65C816 test board](https://mike42.me/blog/2022-06-building-a-65c816-test-board)
 - [Let’s implement power-on self test (POST)](https://mike42.me/blog/2022-06-lets-implement-power-on-self-test-post)
+- [Let’s make a bootloader – Part 1](https://mike42.me/blog/2022-09-lets-make-a-bootloader-part-1)
 
 ## Licenses & acknowledgement
 
