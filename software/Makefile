@@ -1,17 +1,20 @@
 EMULATOR=../emulator/cmake-build-debug/emulator
 
-.PHONY: bootloader kernel kernel_tmp clean all
+.PHONY: bootloader kernel kernel_tmp snake clean all
 
-all: kernel disk.img ramfs.bin
+all: kernel disk.img ramfs.bin snake
 
 bootloader:
 	make -C bootloader boot.bin
-	
+
 kernel_tmp:
 	make -C kernel_tmp kernel_tmp.bin
 
 kernel:
 	make -C kernel kernel.bin
+
+snake:
+	make -C snake snake.bin
 
 ramfs.bin:
 	(cd ramfs && mkdir -p bin/ dev/ &&  python3 ../build_tools/ramfs.py --create --file ../ramfs.bin *)
