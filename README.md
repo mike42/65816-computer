@@ -18,6 +18,7 @@ This is a learning project, and I am blogging about it as I progress.
 - [Let’s implement power-on self test (POST)](https://mike42.me/blog/2022-06-lets-implement-power-on-self-test-post)
 - [Let’s make a bootloader – Part 1](https://mike42.me/blog/2022-09-lets-make-a-bootloader-part-1)
 - [Let’s make a bootloader – Part 2](https://mike42.me/blog/2022-09-lets-make-a-bootloader-part-2)
+- [Converting my 65C816 computer project to 3.3 V](https://mike42.me/blog/2023-01-converting-my-65c816-computer-project-to-3-3-v)
 
 ## Licenses & acknowledgement
 
