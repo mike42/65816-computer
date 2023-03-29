@@ -16,4 +16,3 @@ snake.bin: $(OBJECTS) snake.cfg
 
 clean:
 	rm -f snake.bin $(OBJECTS)
-

@@ -1,6 +1,6 @@
 ; main.s: entry point for kernel
 .import uart_init, uart_print_char, uart_recv_char, uart_printz, panic, __forty_two, shell_main
-.export main
+.export __main
 
 .segment "CODE"
 main:

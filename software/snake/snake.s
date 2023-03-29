@@ -1,10 +1,10 @@
 ; snake.s: a simple game to test the computer
-
+.import uart_printz
 ROM_PRINT_CHAR   := $00
 
 .segment "START"
 start:                              ; entry point
-    jmp main
+    jmp __main
 
 .segment "CODE"
 ;#include <curses.h>
@@ -61,15 +61,16 @@ snake_update_direction:
 ;    }
     rts
 ;
-;void draw_fruit() {
+;void draw_fruit()
+; TODO unported code
+__draw_fruit:
 ;    move(fruit_y, fruit_x);
 ;    printw("%c", '%');
-;}
-;
-;
+    rts
+
 ; void snake_advance()
 ; TODO unported code
-snake_advance:
+__snake_advance:
 ;    struct snake_segment old_snake_head = snake_segments[snake_head_id];
 ;    struct snake_segment new_snake_head = old_snake_head;
 ;    char snake_head_char = 'x';
@@ -137,15 +138,15 @@ snake_advance:
     rts
 
 ;void snake_frame()
-snake_frame:
+__snake_frame:
     jsr snake_update_direction
-    jsr snake_advance
+    jsr __snake_advance
     rts
 
 ;#define RAND_MAX 65535
 ;void srand(uint16_t value)
 ; TODO unported code
-srand:
+__srand:
 ;    random_state = value + 1;
 ;    if(random_state == 0) {
 ;        // Random state must never be 0!
@@ -155,7 +156,7 @@ srand:
 
 ; TODO unported code
 ;uint16_t rand()
-rand:
+__rand:
 ;    // This is a 16-bit Xorshift https://en.wikipedia.org/wiki/Xorshift
 ;    // 7,9,13 triplet is from http://www.retroprogramming.com/2017/07/xorshift-pseudorandom-numbers-in-z80.html
 ;    random_state ^= random_state >> 7;
@@ -165,10 +166,16 @@ rand:
     lda #0
     rts
 
+; Equivalent of printw("%s", str);
+;__printstr:
+;    lda 3, S
+;    jsr uart_printz
+;    rts
+
 ;
 ; int main
 ; TODO unported code
-main:
+__main:
     ; 16-bit accumulator and index registers
     .a16
     .i16
@@ -178,38 +185,39 @@ main:
     cop ROM_PRINT_CHAR
     ; srand(42);
     pea 42
-    jsr srand
+    jsr __srand
 
-;    // Punch this out so we don't get surprises
-;    memset(snake_segments, 255, sizeof(snake_segments));
-;    initscr();
-;    raw();
-;    noecho();
-; Print welcome screen
+; Punch this out so we don't get surprises
+; TODO unported code
+;   memset(snake_segments, 255, sizeof(snake_segments));
+;   initscr();
+;   raw();
+;   noecho();
+
+; Print welcome screen: not having much luck yet but this works-
+    lda #$4141
+    sta f:$c200
+
+    ; set data bank register to equal program bank register (for accessing constants etc).
+;    phk
+;    plb
+;    See welcome_screen label
+;    ldx a:welcome_screen
+;    jsr uart_printz
 ;    const char* scr[13];
-;    scr[0] = "    Y";
-;    scr[1] = "   o^o    Welcome to";
-;    scr[2] = "   \\ /       ____              _";
-;    scr[3] = "   | |      / ___| _ __   __ _| | _____";
-;    scr[4] = "    \\ \\     \\___ \\| '_ \\ / _` | |/ / _ \\";
-;    scr[5] = "     \\ \\     ___) | | | | (_| |   <  __/";
-;    scr[6] = "     | |    |____/|_| |_|\\__,_|_|\\_\\___|";
-;    scr[7] = "    / /";
-;    scr[8] = "   | |  ____    ____    ____    ____    ____";
-;    scr[9] = "   \\ \\_/ __ \\__/ __ \\__/ __ \\__/ __ \\__/ __ \\__";
-;    scr[10] = "    \\___/  \\____/  \\____/  \\____/  \\____/  \\___\\";
-;    scr[11] = "";
-;    scr[12] = "           [ Press any key to start ]";
 ;    int i;
 ;    for(i = 0; i < 13; i++) {
 ;        move(5 + i, 15);
-;        printw("%s\n", scr[i]);
+;        printw("%s", scr[i]);
 ;    }
+
+; TODO unported code
 ;    move(0,0);
 ;    refresh();
 ;    getch();
 ;
-;    // Clear screen
+; Clear screen
+; TODO unported code
 ;    clear();
 ;    refresh();
 ;
@@ -252,7 +260,23 @@ main:
 
 ;void place_fruit()
 ; TODO unported code
-place_fruit:
+__place_fruit:
 ;    fruit_x = rand() % (X_MAX + 1);
 ;    fruit_y = rand() % (Y_MAX + 1);
     rts
+
+welcome_screen: .addr welcome_screen_0, welcome_screen_1, welcome_screen_2, welcome_screen_3, welcome_screen_4, welcome_screen_5, welcome_screen_6, welcome_screen_7, welcome_screen_8, welcome_screen_9, welcome_screen_10, welcome_screen_11, welcome_screen_12
+welcome_screen_0: .asciiz "    Y\n"
+welcome_screen_1: .asciiz "   o^o    Welcome to\n"
+welcome_screen_2: .asciiz "   \\ /       ____              _\n"
+welcome_screen_3: .asciiz "   | |      / ___| _ __   __ _| | _____\n"
+welcome_screen_4: .asciiz "    \\ \\     \\___ \\| '_ \\ / _` | |/ / _ \\\n"
+welcome_screen_5: .asciiz "     \\ \\     ___) | | | | (_| |   <  __/\n"
+welcome_screen_6: .asciiz "     | |    |____/|_| |_|\\__,_|_|\\_\\___|\n"
+welcome_screen_7: .asciiz "    / /\n"
+welcome_screen_8: .asciiz "   | |  ____    ____    ____    ____    ____\n"
+welcome_screen_9: .asciiz "   \\ \\_/ __ \\__/ __ \\__/ __ \\__/ __ \\__/ __ \\__\n"
+welcome_screen_10: .asciiz "    \\___/  \\____/  \\____/  \\____/  \\____/  \\___\\\n"
+welcome_screen_11: .asciiz "\n"
+welcome_screen_12: .asciiz "           [ Press any key to start ]\n"
+
