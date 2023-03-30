@@ -9,6 +9,7 @@ OBJECTS = $(SOURCES:.s=.o)
 snake.bin: $(OBJECTS) snake.cfg
 	$(LD65) -o snake.bin \
 		-C snake.cfg \
+		--dbgfile snake.dbg \
 		$(OBJECTS)
 
 %.o: %.s

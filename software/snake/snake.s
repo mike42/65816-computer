@@ -1,6 +1,7 @@
 ; snake.s: a simple game to test the computer
-.import uart_printz
 ROM_PRINT_CHAR   := $00
+UART_THR = $00c200
+UART_LSR = $00c205
 
 .segment "START"
 start:                              ; entry point
@@ -172,6 +173,35 @@ __rand:
 ;    jsr uart_printz
 ;    rts
 
+temp_print_char:
+    php
+    sep #%00100000
+    .a8
+    pha
+@uart_print_wait_for_ready:         ; wait until transmit register is empty
+    lda f:UART_LSR
+    and #%00100000
+    cmp #%00100000
+    bne @uart_print_wait_for_ready
+    pla
+
+    sta f:UART_THR
+
+    plp                             ; Revert to previous setting
+    rts
+;
+;   .a8                             ; Use 8-bit accumulator
+;    sep #%00100000
+;    pha
+;; ??
+;;@uart_print_wait_for_ready:         ; wait until transmit register is empty
+;;    lda f:UART_LSR
+;;    and #%00100000
+;;    cmp #%00100000
+;;    bne @uart_print_wait_for_ready
+;;    pla
+;    sta f:UART_THR
+
 ;
 ; int main
 ; TODO unported code
@@ -181,11 +211,11 @@ __main:
     .i16
     rep #%00110000
     ; some test code
-    lda #'u'
-    cop ROM_PRINT_CHAR
-    ; srand(42);
-    pea 42
-    jsr __srand
+;    lda #'u'
+;    cop ROM_PRINT_CHAR
+;    ; srand(42);
+;    pea 42
+;    jsr __srand
 
 ; Punch this out so we don't get surprises
 ; TODO unported code
@@ -194,15 +224,28 @@ __main:
 ;   raw();
 ;   noecho();
 
-; Print welcome screen: not having much luck yet but this works-
-    lda #$4141
-    sta f:$c200
+;; Print welcome screen: not having much luck yet but this works-
+;    lda #$4243
+;    sta f:$c200
+;
+;    ; set data bank register to equal program bank register (for accessing constants etc).
+    phk
+    plb
+;
+    lda #'q'
 
-    ; set data bank register to equal program bank register (for accessing constants etc).
-;    phk
-;    plb
+    sta f:$c200
+;
+;    lda 71
+;    lda #$4700
+    lda #$4546
+    jsr temp_print_char
+
 ;    See welcome_screen label
-;    ldx a:welcome_screen
+;    ldx #(welcome_screen_0 & $FFFF)
+;    lda welcome_screen_0 & $FFFF
+;    sta f:$c200
+;    ldx #(test_string & $FFFF)
 ;    jsr uart_printz
 ;    const char* scr[13];
 ;    int i;
@@ -264,6 +307,8 @@ __place_fruit:
 ;    fruit_x = rand() % (X_MAX + 1);
 ;    fruit_y = rand() % (Y_MAX + 1);
     rts
+
+test_string: .asciiz "Hello world\n"
 
 welcome_screen: .addr welcome_screen_0, welcome_screen_1, welcome_screen_2, welcome_screen_3, welcome_screen_4, welcome_screen_5, welcome_screen_6, welcome_screen_7, welcome_screen_8, welcome_screen_9, welcome_screen_10, welcome_screen_11, welcome_screen_12
 welcome_screen_0: .asciiz "    Y\n"
