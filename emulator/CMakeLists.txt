@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 project(Emulator
         LANGUAGES CXX)
 
-add_executable(emulator
+add_library(cpu65816
         src/cpu/Addressing.cpp
         src/cpu/Binary.cpp
         src/cpu/Cpu65816.cpp
@@ -44,7 +44,6 @@ add_executable(emulator
         src/cpu/SystemBus.cpp
         src/cpu/SystemBusDevice.cpp
         src/logging/Log.cpp
-        src/main.cpp
         src/devices/Ram.cpp
         src/devices/Rom.cpp
         src/devices/Via.cpp
@@ -54,7 +53,18 @@ add_executable(emulator
         src/cpu/SpeedLimit.cpp
         src/cpu/SpeedLimit.h)
 
-target_link_libraries(emulator)
+add_executable(emulator
+        src/main.cpp)
+
+target_link_libraries(emulator
+        cpu65816)
+
+target_include_directories(cpu65816 PRIVATE
+        src/
+        src/cpu
+        src/devices
+        src/logging
+        )
 
 target_include_directories(emulator PRIVATE
         src/
