@@ -5,6 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 project(Emulator
         LANGUAGES CXX)
 
+enable_testing()
+
+find_package(GTest REQUIRED)
+find_package(Boost 1.79 COMPONENTS program_options)
+
 add_library(cpu65816
         src/cpu/Addressing.cpp
         src/cpu/Binary.cpp
@@ -56,19 +61,26 @@ add_library(cpu65816
 add_executable(emulator
         src/main.cpp)
 
+add_executable(emulator_test
+        src/test.cpp)
+
+include_directories(cpu65816 PRIVATE
+        src/
+        src/cpu
+        src/devices
+        src/logging
+        ${Boost_INCLUDE_DIR}
+        )
+
 target_link_libraries(emulator
-        cpu65816)
+        cpu65816
+        ${Boost_LIBRARIES})
 
-target_include_directories(cpu65816 PRIVATE
-        src/
-        src/cpu
-        src/devices
-        src/logging
-        )
+target_include_directories(emulator_test PRIVATE
+        ${GTest_INCLUDE_DIR})
 
-target_include_directories(emulator PRIVATE
-        src/
-        src/cpu
-        src/devices
-        src/logging
-        )
+target_link_libraries(emulator_test
+        gtest
+        gtest_main)
+
+gtest_discover_tests(emulator_test)

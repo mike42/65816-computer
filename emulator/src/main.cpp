@@ -29,6 +29,7 @@ int main(int argc, char **argv) {
     SystemBus systemBus = SystemBus();
     systemBus.registerDevice(&via);
     systemBus.registerDevice(&uart);
+
     systemBus.registerDevice(&rom);
     systemBus.registerDevice(&ram);
 

@@ -10,6 +10,11 @@ To build the emulator itself, you will need:
 
 - cmake - tested on 3.22.1
 - GCC - tested on 11.2.0.
+- Google test and boost libraries, installed on Debian via command below.
+
+```
+sudo apt install libgtest-dev libboost1.81-dev
+```
 
 The emulator is only tested on Linux, and only implements hardware features which are used by the computer.
 
@@ -17,8 +22,8 @@ The emulator is only tested on Linux, and only implements hardware features whic
 
 ```
 cmake .
-make
-./emulator
+make && make test
+./emulator ../rom/rom.bin
 ```
 
 ## License & Attribution

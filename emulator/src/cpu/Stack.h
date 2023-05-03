@@ -28,7 +28,7 @@
 class Stack {
 public:
 
-    Stack(SystemBus *);
+    explicit Stack(SystemBus *);
     Stack(SystemBus *, uint16_t);
 
     void push8Bit(uint8_t);
