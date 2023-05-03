@@ -4,13 +4,13 @@
 
 class TerminalWrapper {
 public:
-    TerminalWrapper();
+    TerminalWrapper(bool skip);
 
     void writeChar(unsigned char charToWrite) const;
 
     bool readChar(unsigned char &res);
 
-    virtual ~TerminalWrapper();
+    ~TerminalWrapper();
 
 private:
     int sockfd;

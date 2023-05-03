@@ -29,7 +29,7 @@
 
 class Cpu65816Debugger {
 public:
-    Cpu65816Debugger(Cpu65816 &);
+    explicit Cpu65816Debugger(Cpu65816 &);
 
     void step();
     void setBreakPoint(const Address &);

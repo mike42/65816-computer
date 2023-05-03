@@ -8,7 +8,7 @@ project(Emulator
 enable_testing()
 
 find_package(GTest REQUIRED)
-find_package(Boost 1.79 COMPONENTS program_options)
+find_package(Boost 1.74 COMPONENTS program_options REQUIRED)
 
 add_library(cpu65816
         src/cpu/Addressing.cpp
@@ -56,7 +56,7 @@ add_library(cpu65816
         src/devices/Uart.cpp
         src/devices/TerminalWrapper.cpp
         src/cpu/SpeedLimit.cpp
-        src/cpu/SpeedLimit.h)
+        src/cpu/SpeedLimit.h src/DebugSymbols.cpp src/DebugSymbols.h)
 
 add_executable(emulator
         src/main.cpp)
@@ -64,17 +64,19 @@ add_executable(emulator
 add_executable(emulator_test
         src/test.cpp)
 
-include_directories(cpu65816 PRIVATE
+include_directories(PRIVATE
         src/
         src/cpu
         src/devices
         src/logging
-        ${Boost_INCLUDE_DIR}
         )
 
 target_link_libraries(emulator
         cpu65816
-        ${Boost_LIBRARIES})
+        Boost::program_options)
+
+target_include_directories(emulator PRIVATE
+        ${Boost_INCLUDE_DIR})
 
 target_include_directories(emulator_test PRIVATE
         ${GTest_INCLUDE_DIR})

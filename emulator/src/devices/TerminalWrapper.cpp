@@ -6,7 +6,12 @@
 #include <iostream>
 #include "TerminalWrapper.h"
 
-TerminalWrapper::TerminalWrapper() {
+TerminalWrapper::TerminalWrapper(bool skip) {
+    if (skip) {
+        sockfd = -1;
+        connfd = -1;
+        return;
+    }
     // Adapted from examples at:
     // - https://www.linuxhowtos.org/C_C++/socket.htm
     // - https://www.ibm.com/docs/en/i/7.2?topic=uauaf-example-server-application-that-uses-af-unix-address-family
@@ -42,7 +47,11 @@ TerminalWrapper::~TerminalWrapper() {
 }
 
 void TerminalWrapper::writeChar(const unsigned char ch) const {
-    if (connfd < 0) {
+    if(sockfd < 0) { // Means not creating unix socket for minicom, pass output to stdout instead.
+        std::cout << ch;
+        return;
+    }
+    if (connfd < 0 ) {
         return;
     }
     write(connfd, &ch, 1);
@@ -57,3 +66,4 @@ bool TerminalWrapper::readChar(unsigned char &res) {
     }
     return false;
 }
+

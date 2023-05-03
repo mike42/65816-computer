@@ -1,0 +1,10 @@
+#ifndef EMULATOR_DEBUGSYMBOLS_H
+#define EMULATOR_DEBUGSYMBOLS_H
+
+
+class DebugSymbols {
+
+};
+
+
+#endif //EMULATOR_DEBUGSYMBOLS_H

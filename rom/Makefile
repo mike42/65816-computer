@@ -4,7 +4,7 @@ MINIPRO=minipro
 
 .PHONY: all clean flashrom_at28c256 flashrom_sst39lf010
 
-all: rom.bin nop.bin
+all: rom.bin nop.bin rom_at28c256.bin rom_sst39lf010.bin
 
 SOURCES = $(wildcard *.s)
 OBJECTS = $(SOURCES:.s=.o)
@@ -24,17 +24,21 @@ nop.bin:
 clean:
 	rm -f rom.bin rom_at28c256.bin rom_sst39lf010.bin $(OBJECTS) nop.bin rom.txt
 
-# Used in 5 V system.
-flashrom_at28c256: rom.bin
+# AT28C256 - Used in 5 V system.
+rom_at28c256.bin: rom.bin
 	cp -f rom.bin rom_at28c256.bin
 	# padded to 32 KiB
 	truncate -s 32768 rom_at28c256.bin
+
+flashrom_at28c256: rom_at28c256.bin
 	$(MINIPRO) -p AT28C256 -w rom_at28c256.bin
 
-# Used in 3.3 V system
-flashrom_sst39lf010: rom.bin
+# SST39lF010 - Used in 3.3 V system
+rom_sst39lf010.bin: rom.bin
 	cp -f rom.bin rom_sst39lf010.bin
 	# padded to 128 KiB
 	truncate -s 131072 rom_sst39lf010.bin
+
+flashrom_sst39lf010: rom_sst39lf010.bin
 	$(MINIPRO) -p "SST39LF010@PLCC32" -w rom_sst39lf010.bin
 
