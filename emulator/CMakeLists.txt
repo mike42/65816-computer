@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 project(Emulator
         LANGUAGES CXX)
@@ -8,8 +8,16 @@ project(Emulator
 enable_testing()
 
 find_package(GTest REQUIRED)
-find_package(Boost 1.74 COMPONENTS program_options REQUIRED)
+find_package(Boost 1.74 COMPONENTS program_options filesystem REQUIRED)
 
+include_directories(PRIVATE
+        src/
+        src/cpu
+        src/devices
+        src/logging
+        )
+
+# Most code is in a library for easier testing
 add_library(cpu65816
         src/cpu/Addressing.cpp
         src/cpu/Binary.cpp
@@ -56,20 +64,14 @@ add_library(cpu65816
         src/devices/Uart.cpp
         src/devices/TerminalWrapper.cpp
         src/cpu/SpeedLimit.cpp
-        src/cpu/SpeedLimit.h src/DebugSymbols.cpp src/DebugSymbols.h)
+        src/cpu/SpeedLimit.h src/cpu/DebugSymbols.cpp src/cpu/DebugSymbols.h)
 
+target_link_libraries(cpu65816
+        Boost::filesystem)
+
+# main emulator executable
 add_executable(emulator
         src/main.cpp)
-
-add_executable(emulator_test
-        src/test.cpp)
-
-include_directories(PRIVATE
-        src/
-        src/cpu
-        src/devices
-        src/logging
-        )
 
 target_link_libraries(emulator
         cpu65816
@@ -77,6 +79,10 @@ target_link_libraries(emulator
 
 target_include_directories(emulator PRIVATE
         ${Boost_INCLUDE_DIR})
+
+# test executable
+add_executable(emulator_test
+        test/test.cpp)
 
 target_include_directories(emulator_test PRIVATE
         ${GTest_INCLUDE_DIR})

@@ -1,0 +1,3 @@
+al 00E004 .test_this_will_fail
+al 00E001 .test_this_will_pass
+al 00E000 .test_setup

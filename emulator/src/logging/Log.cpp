@@ -21,7 +21,7 @@
 
 #define HEX_PREFIX "$"
 
-Log Log::sVerboseLog(false);
+Log Log::sVerboseLog(true);
 Log Log::sDebugLog(false);
 Log Log::sTraceLog(false);
 Log Log::sErrorLog(false);

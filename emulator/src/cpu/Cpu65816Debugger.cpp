@@ -22,7 +22,7 @@
 
 #define LOG_TAG "Cpu65816Debugger"
 
-Cpu65816Debugger::Cpu65816Debugger(Cpu65816 &cpu) : mCpu(cpu) {
+Cpu65816Debugger::Cpu65816Debugger(Cpu65816 &cpu, DebugSymbols &symbols): mCpu(cpu), mSymbols(symbols) {
     cpu.setRESPin(false);
 
     Log::dbg(LOG_TAG).str("Cpu is ready to run").show();

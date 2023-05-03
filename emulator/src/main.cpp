@@ -131,14 +131,14 @@ int main(int argc, char **argv) {
     if(testMode) {
         // Load code into RAM in test mode, so we can test eg. self-modifying code
         ram.loadFromFile(testPath, Address(0x00, 0xe000), 8192);
-        // TODO load debug symbols here
+        symbols.add(testPath);
     } else {
         systemBus.registerDevice(&rom);
-        // TODO load debug symbols here
+        symbols.add(romPath);
     }
     if (!kernelPath.empty()) {
         ram.loadFromFile(kernelPath, Address(0x01, 0x0000), 8192);
-        // TODO load debug symbols here
+        symbols.add(kernelPath);
     }
     systemBus.registerDevice(&ram);
 
@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
     auto irq = std::make_shared<InterruptStatus>();
 
     Cpu65816 cpu(systemBus, nmi, irq);
-    Cpu65816Debugger debugger(cpu); // TODO pass along debug symbols here
+    Cpu65816Debugger debugger(cpu, symbols);
 
     if(testMode) {
         return executeTestMode(cpu, debugger);

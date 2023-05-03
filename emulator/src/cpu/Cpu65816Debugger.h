@@ -23,13 +23,14 @@
 #include <cstdint>
 #include <functional>
 
+#include "DebugSymbols.h"
 #include "SystemBusDevice.h"
 #include "BuildConfig.h"
 #include "Cpu65816.h"
 
 class Cpu65816Debugger {
 public:
-    explicit Cpu65816Debugger(Cpu65816 &);
+    Cpu65816Debugger(Cpu65816 &, DebugSymbols &);
 
     void step();
     void setBreakPoint(const Address &);
@@ -53,7 +54,7 @@ private:
     bool mBreakpointHit = false;
 
     Cpu65816 &mCpu;
-
+    DebugSymbols &mSymbols;
 };
 
 #endif // EMULATOR_CPU65816DEBUGGER_H

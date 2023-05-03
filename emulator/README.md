@@ -13,7 +13,7 @@ To build the emulator itself, you will need:
 - Google test and boost libraries, installed on Debian via command below.
 
 ```
-sudo apt install libgtest-dev libboost1.74-dev libboost-program-options1.74-dev
+sudo apt install libgtest-dev libboost1.74-dev libboost-program-options1.74-dev libboost-filesystem1.74-dev
 ```
 
 The emulator is only tested on Linux, and only implements hardware features which are used by the computer.
