@@ -20,11 +20,47 @@ The emulator is only tested on Linux, and only implements hardware features whic
 
 ## Quick start
 
+Compile and test a release build:
+
 ```
-cmake .
-make && make test
-./emulator --rom ../rom/rom.bin
+cmake -B build/release
+make -j8 -C build/release all test
 ```
+
+Run the emulator:
+
+```
+./build/release/emulator --rom ../rom/rom.bin
+```
+
+This will create a unix socket called 'serial1' in the current directory. In a separate terminal window, connect to this socket with minicom to interact with the emulated system.
+
+```
+minicom -D unix#serial
+```
+
+## Test mode
+
+The emulator also functions as a unit test runner for the 65816 assembly projects in this repository. It uses debug information (a list of labels in VICE format) to locate and execute a `test_setup` routine, followed by every routine beginning with the name `test_`. If a routine leaves 0 in the accumulator after returning, it is recorded as a test pass. Any other value is recorded as a test failure.
+
+An example project is located in the `test/resources/testing_example/` directory to show how this feature works. Execute the tests with the following command:
+
+```
+./build/release/emulator --test test/resources/testing_example/test.bin
+```
+
+## Fuzz tests
+
+Fuzz tests are not built by default, since they depend on different build flags, as well as the use of clang.
+
+Build them with the following commands:
+
+```
+CC=clang CXX=clang++ cmake -DFUZZ=1 -B build/fuzz
+make -j8 -C build/fuzz
+```
+
+Next, run your fuzzer of choice from the `build/fuzz` directory.
 
 ## License & Attribution
 

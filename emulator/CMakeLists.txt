@@ -96,3 +96,16 @@ target_link_libraries(emulator_test
         gtest_main)
 
 gtest_discover_tests(emulator_test)
+
+add_executable(fuzz_debug_symbols_parser
+        test/DebugSymbolsFuzz.cpp)
+target_link_libraries(fuzz_debug_symbols_parser
+        cpu65816
+        -fsanitize=address,fuzzer)
+
+if(FUZZ)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address,fuzzer-no-link -fsanitize-coverage=edge,indirect-calls")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,fuzzer-no-link -fsanitize-coverage=edge,indirect-calls")
+else ()
+    set_target_properties(fuzz_debug_symbols_parser PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
+endif()

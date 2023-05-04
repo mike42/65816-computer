@@ -26,7 +26,7 @@ void DebugSymbols::loadSymbolsForBinary(const boost::filesystem::path &imagePath
 void DebugSymbols::loadLabelLine(const std::string &line) {
     // input format: "al 00E001 .some_label"
     typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-    boost::char_separator<char> sep{" ."}; // '.' used to drop unwanted prefix from label names.
+    boost::char_separator<char> sep{" "};
     tokenizer tok{line, sep};
     // iterate space-separated tokens within the line
     int i = 0;
@@ -40,7 +40,12 @@ void DebugSymbols::loadLabelLine(const std::string &line) {
         } else if (i == 1) {
             addrString = t;
         } else if (i == 2) {
-            name = t;
+            if(t.starts_with('.')) {
+                // Trim expected leading '.'
+                name = t.substr(1);
+            } else {
+                name = t;
+            }
         } else {
             // Too many fields
             return;
@@ -52,7 +57,13 @@ void DebugSymbols::loadLabelLine(const std::string &line) {
         return;
     }
     // Parse out the address
-    auto addrLong = std::stoul(addrString, nullptr, 16);
+    unsigned long addrLong;
+    try {
+        addrLong = std::stoul(addrString, nullptr, 16);
+    } catch (std::exception &e) {
+        // Out of range or not valid hex address
+        return;
+    }
     auto address = Address(addrLong & 0xFF0000 >> 4, addrLong & 0xFFFF);
     labels.insert({name, address});
 }
