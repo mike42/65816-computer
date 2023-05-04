@@ -31,7 +31,7 @@ int executeTestRoutine(Cpu65816& cpu, Cpu65816Debugger &debugger, const Address 
     return cpu.getA();
 }
 
-int executeTestMode(Cpu65816& cpu, Cpu65816Debugger& debugger) {
+int executeTestMode(Cpu65816 &cpu, Cpu65816Debugger &debugger, DebugSymbols symbols) {
     bool breakPointHit = false;
     debugger.doBeforeStep([]() {});
     debugger.doAfterStep([]() {});
@@ -41,17 +41,44 @@ int executeTestMode(Cpu65816& cpu, Cpu65816Debugger& debugger) {
     debugger.onStp([&cpu, &breakPointHit]() {
         breakPointHit = true;
     });
-
-    // TODO use debug symbols to locate tests.
-    // Run test setup
-    uint16_t result0 = executeTestRoutine(cpu, debugger, Address(0x00, 0xE000)); // .test_setup
-
-    // Run a test
-    uint16_t result1 = executeTestRoutine(cpu, debugger, Address(0x00, 0xE001)); // .test_this_will_pass
-    uint16_t result2 = executeTestRoutine(cpu, debugger,Address( 0x00, 0xE004)); // .test_this_will_fail
-
-    // Return number of failed tests
-    return result1 + result2;
+    const int testWidth = 45;
+    // Run test setup first if it is defined
+    if(symbols.labels.contains("test_setup")) {
+        Address testSetupRoutine = symbols.labels["test_setup"];
+        std::cerr << std::left << std::setw(testWidth) << "test_setup";
+        uint16_t setupResult = executeTestRoutine(cpu, debugger, testSetupRoutine);
+        if(setupResult != 0) {
+            std::cerr << " [ FAIL ]" << std::endl;
+            return 1;
+        }
+        std::cerr << " [  OK  ]" << std::endl << std::endl;
+    }
+    // Iterate labels, run any that look like test routines
+    int testsExecuted = 0;
+    int testsPassed = 0;
+    int testsFailed = 0;
+    for (auto & itr : symbols.labels) {
+        auto label = itr.first;
+        if(label == "test_setup" || !label.starts_with("test_")) {
+            // Not a test
+            continue;
+        }
+        std::cerr << std::left << std::setw(testWidth) << label;
+        // Run the test
+        uint16_t testResult = executeTestRoutine(cpu, debugger, itr.second);
+        // Record result
+        testsExecuted++;
+        if(testResult == 0) {
+            testsPassed++;
+            std::cerr << " [ PASS ]" << std::endl;
+        } else {
+            testsFailed++;
+            std::cerr << " [ FAIL ]" << std::endl;
+        }
+    }
+    std::cerr << std::endl << testsExecuted << " tests executed. " << testsPassed << " passed, " << testsFailed
+              << " failed." << std::endl;
+    return testsFailed;
 }
 
 int executeFromReset(Cpu65816& cpu, Cpu65816Debugger& debugger) {
@@ -131,14 +158,14 @@ int main(int argc, char **argv) {
     if(testMode) {
         // Load code into RAM in test mode, so we can test eg. self-modifying code
         ram.loadFromFile(testPath, Address(0x00, 0xe000), 8192);
-        symbols.add(testPath);
+        symbols.loadSymbolsForBinary(testPath);
     } else {
         systemBus.registerDevice(&rom);
-        symbols.add(romPath);
+        symbols.loadSymbolsForBinary(romPath);
     }
     if (!kernelPath.empty()) {
         ram.loadFromFile(kernelPath, Address(0x01, 0x0000), 8192);
-        symbols.add(kernelPath);
+        symbols.loadSymbolsForBinary(kernelPath);
     }
     systemBus.registerDevice(&ram);
 
@@ -149,7 +176,7 @@ int main(int argc, char **argv) {
     Cpu65816Debugger debugger(cpu, symbols);
 
     if(testMode) {
-        return executeTestMode(cpu, debugger);
+        return executeTestMode(cpu, debugger, symbols);
     } else {
         return executeFromReset(cpu, debugger);
     }

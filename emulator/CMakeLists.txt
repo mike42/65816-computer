@@ -82,12 +82,16 @@ target_include_directories(emulator PRIVATE
 
 # test executable
 add_executable(emulator_test
-        test/test.cpp)
+        test/DebugSymbolsTest.cpp)
+
+target_compile_definitions(emulator_test PUBLIC
+        TEST_RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/resources")
 
 target_include_directories(emulator_test PRIVATE
         ${GTest_INCLUDE_DIR})
 
 target_link_libraries(emulator_test
+        cpu65816
         gtest
         gtest_main)
 
