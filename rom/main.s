@@ -20,6 +20,14 @@ post_done:                          ; POST passed, time to run some code
     jsr uart_init                   ; show a startup message
     ldx #rom_message
     cop ROM_PRINT_STRING
+.if .defined(WARM_BOOT)
+; stub out boot process if WARM_BOOT is defined at build time.
+; this is a hack for the emulator: it will place the code in RAM for us, and
+; these disk routines will not work.
+    ldx #warm_boot_message
+    cop ROM_PRINT_STRING
+    jml $010000
+.endif
     ; Current boot order
     jsr sd_init_multiple_attempts   ; attempt SD card init
     cmp #0
@@ -112,6 +120,9 @@ boot_prompt_sd: .asciiz "Boot from SD card? (y/N) "
 string_sd_reset_fail: .asciiz "SD card init failed\r\n"
 boot_prompt_serial: .asciiz "Boot from serial (y/N) "
 string_boot_serial_fail: .asciiz "Serial transfer failed\r\n"
+.if .defined(WARM_BOOT)
+warm_boot_message: .asciiz "Performing warm boot\r\n"
+.endif
 start_of_line:
 .byte $1b
 .asciiz "[1G"

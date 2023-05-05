@@ -4,25 +4,31 @@ MINIPRO=minipro
 
 .PHONY: all clean flashrom_at28c256 flashrom_sst39lf010
 
-all: rom.bin nop.bin rom_at28c256.bin rom_sst39lf010.bin
+all: rom.bin rom_emulator.bin nop.bin rom_at28c256.bin rom_sst39lf010.bin
 
-SOURCES = $(wildcard *.s)
-OBJECTS = $(SOURCES:.s=.o)
-
-rom.bin: $(OBJECTS) system.cfg
+rom.bin: address.o interrupt.o main.o post.o sd_card.o uart.o vectors.o xmodem.o system.cfg
 	$(LD65) -o rom.bin \
-		-Ln rom.txt \
+		-Ln rom.lbl \
 		-C system.cfg \
-		$(OBJECTS)
+		address.o interrupt.o main.o post.o sd_card.o uart.o vectors.o xmodem.o
+
+rom_emulator.bin: address.o interrupt.o main_emulator.o post.o sd_card.o uart.o vectors.o xmodem.o system.cfg
+	$(LD65) -o rom_emulator.bin \
+		-Ln rom_emulator.lbl \
+		-C system.cfg \
+		address.o interrupt.o main_emulator.o post.o sd_card.o uart.o vectors.o xmodem.o
 
 nop.bin:
 	python3 -c "open('nop.bin', 'wb').write(b'\xea' * 8192)"
+
+main_emulator.o: main.s
+	$(CA65) --feature string_escapes --cpu 65816 --debug-info -DWARM_BOOT=1 $< -o main_emulator.o
 
 %.o: %.s
 	$(CA65) --feature string_escapes --cpu 65816 --debug-info $<
 
 clean:
-	rm -f rom.bin rom_at28c256.bin rom_sst39lf010.bin $(OBJECTS) nop.bin rom.txt
+	rm -f rom.bin rom_emulator.bin rom_at28c256.bin rom_sst39lf010.bin address.o interrupt.o main_emulator.o post.o sd_card.o uart.o vectors.o xmodem.o nop.bin rom.txt
 
 # AT28C256 - Used in 5 V system.
 rom_at28c256.bin: rom.bin
