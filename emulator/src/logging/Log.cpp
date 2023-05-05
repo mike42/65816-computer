@@ -87,3 +87,6 @@ void Log::show() {
     }
 }
 
+void Log::enable() {
+    mEnabled = true;
+}

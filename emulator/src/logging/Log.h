@@ -34,7 +34,7 @@ private:
 
     Log(const bool);
     const char *mTag;
-    const bool mEnabled;
+    bool mEnabled;
     std::ostringstream mStream;
 
 public:
@@ -47,6 +47,7 @@ public:
     // Returns error log
     static Log &err(const char *);
 
+    void enable();
     Log &str(const char *);
     Log &hex(uint32_t);
     Log &hex(uint32_t, uint8_t);

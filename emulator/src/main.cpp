@@ -110,6 +110,7 @@ int main(int argc, char **argv) {
     std::string romPath;
     std::string kernelPath;
     std::string testPath;
+    bool traceLog = false;
     bool testMode;
     // Parse command-line options
     try {
@@ -121,7 +122,8 @@ int main(int argc, char **argv) {
                 ("kernel", po::value(&kernelPath),
                  "Set kernel image, 8192 byte file to be loaded at $010000. If this option is used, ROM must be set. SD card emulation is not implemented, so this is intended to be used with a ROM image which has been modified to boot directly into the kernel code instead of attempting to load it from disk.")
                 ("test", po::value(&testPath),
-                 "Set test image, 8192 byte file to be loaded into RAM at $00e000. This is a different execution mode, intended for running unit tests. No ROM or Kernel image is required, and the machine will not emulate a proper console. Instead, the emulator will load a labels file, execute the test setup subroutine ('test_setup'), then execute each test subroutine (labels beginning with 'test_'). If a test is successful, it should return with the value0 in the accumulator, any other value indicates test failure.");
+                 "Set test image, 8192 byte file to be loaded into RAM at $00e000. This is a different execution mode, intended for running unit tests. No ROM or Kernel image is required, and the machine will not emulate a proper console. Instead, the emulator will load a labels file, execute the test setup subroutine ('test_setup'), then execute each test subroutine (labels beginning with 'test_'). If a test is successful, it should return with the value0 in the accumulator, any other value indicates test failure.")
+                ("trace", po::bool_switch(&traceLog), "Enable detailed trace-level logging.");
         po::variables_map vm;
         store(parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
@@ -129,6 +131,9 @@ int main(int argc, char **argv) {
             // Show help
             std::cerr << desc << "\n";
             return 0;
+        }
+        if(traceLog) {
+            Log::trc(LOG_TAG).enable();
         }
         // Error if we get incompatible options
         if(romPath.empty() && testPath.empty()) {
