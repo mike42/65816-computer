@@ -22,6 +22,9 @@ ramfs.bin:
 disk.img: bootloader kernel_tmp
 	cat bootloader/boot.bin kernel_tmp/kernel_tmp.bin > disk.img
 
+snake.img: bootloader snake
+	cat bootloader/boot.bin snake/snake.bin > snake.img
+
 clean:
 	make -C bootloader clean
 	make -C kernel clean
