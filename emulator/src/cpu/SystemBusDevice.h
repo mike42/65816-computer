@@ -59,6 +59,10 @@ public:
     uint16_t getOffset() const {
         return mOffset;
     }
+
+    uint32_t getAbsolute() const {
+        return (mBank << 16) + mOffset;
+    }
 };
 
 /**

@@ -22,7 +22,7 @@
 
 #define LOG_TAG "Cpu65816Debugger"
 
-Cpu65816Debugger::Cpu65816Debugger(Cpu65816 &cpu, DebugSymbols &symbols): mCpu(cpu), mSymbols(symbols) {
+Cpu65816Debugger::Cpu65816Debugger(Cpu65816 &cpu, DebugSymbols &symbols, bool &trace): mCpu(cpu), mSymbols(symbols), mTrace(trace) {
     cpu.setRESPin(false);
 
     Log::dbg(LOG_TAG).str("Cpu is ready to run").show();
@@ -89,12 +89,29 @@ void Cpu65816Debugger::dumpCpu() const {
     Log::trc(LOG_TAG).str("====== CPU status end ======").show();
 }
 
+std::string hex(uint32_t val, int width) {
+    std::ostringstream out;
+    out << '$' << std::setw(width) << std::setfill('0') << std::hex << val;
+    return out.str();
+}
+
 void Cpu65816Debugger::logOpCode(OpCode &opCode) const {
+    if(!mTrace) {
+        return;
+    }
+
+    std::ostringstream stream;
+    int symbolSpace = 30;
     Address onePlusOpCodeAddress = mCpu.mProgramAddress.newWithOffset(1);
 
-    Log &log = Log::trc(LOG_TAG);
-    log.hex(mCpu.mProgramAddress.getBank(), 2).str(":").hex(mCpu.mProgramAddress.getOffset(), 4);
-    log.str(" | ").hex(opCode.getCode(), 2).sp().str(opCode.getName()).sp();
+    // Report program counter location
+    uint32_t absoluteLongProgramCounter = mCpu.mProgramAddress.getAbsolute();
+    std::string reportedName;
+    if(mSymbols.labelsReverse.contains(absoluteLongProgramCounter)) {
+        reportedName = mSymbols.labelsReverse[absoluteLongProgramCounter];
+    }
+    stream << hex(absoluteLongProgramCounter, 6) << ": " << std::left << std::setw(symbolSpace) << reportedName;
+    stream << hex(opCode.getCode(), 2) << ' ' << opCode.getName() << ' ';
 
     switch (opCode.getAddressingMode()) {
         case AddressingMode::Interrupt:
@@ -105,19 +122,19 @@ void Cpu65816Debugger::logOpCode(OpCode &opCode) const {
             // This refers to accumulator size to estimate the kind of value to print.
             // Instructions using index registers might print the wrong value.
             if (mCpu.accumulatorIs8BitWide()) {
-                log.str("#").hex(mCpu.mSystemBus.readByte(mCpu.getAddressOfOpCodeData(opCode)), 2);
+                stream << '#' << hex(mCpu.mSystemBus.readByte(mCpu.getAddressOfOpCodeData(opCode)), 2);
             } else {
-                log.str("#").hex(mCpu.mSystemBus.readTwoBytes(mCpu.getAddressOfOpCodeData(opCode)), 4);
+                stream << '#' << hex(mCpu.mSystemBus.readTwoBytes(mCpu.getAddressOfOpCodeData(opCode)), 4);
             }
             break;
         case AddressingMode::Absolute:
-            log.hex(mCpu.getAddressOfOpCodeData(opCode).getOffset(), 4).sp();
-            log.str("                    [Absolute]");
+            stream << hex(mCpu.getAddressOfOpCodeData(opCode).getOffset(), 4) << ' ';
+            stream << "                    [Absolute]";
             break;
         case AddressingMode::AbsoluteLong: {
             Address opCodeDataAddress = mCpu.getAddressOfOpCodeData(opCode);
-            log.hex(opCodeDataAddress.getBank(), 2).str(":").hex(opCodeDataAddress.getOffset(), 4).sp();
-            log.str("                [Absolute Long]");
+            stream << hex(opCodeDataAddress.getAbsolute(), 6) << ' ';
+            stream << "                  [Absolute Long]";
         }
             break;
         case AddressingMode::AbsoluteIndirect:
@@ -125,62 +142,64 @@ void Cpu65816Debugger::logOpCode(OpCode &opCode) const {
         case AddressingMode::AbsoluteIndirectLong:
             break;
         case AddressingMode::AbsoluteIndexedIndirectWithX:
+            stream << "(" << hex(mCpu.mSystemBus.readTwoBytes(onePlusOpCodeAddress), 4) << ", X)";
+            stream << "                [Absolute Indexed Indirect, X]";
             break;
         case AddressingMode::AbsoluteIndexedWithX:
-            log.hex(mCpu.mSystemBus.readTwoBytes(onePlusOpCodeAddress), 4).str(", X").sp();
-            log.str("                 [Absolute Indexed, X]");
+            stream << hex(mCpu.mSystemBus.readTwoBytes(onePlusOpCodeAddress), 4) << ", X" << " ";
+            stream << "                 [Absolute Indexed, X]";
             break;
         case AddressingMode::AbsoluteLongIndexedWithX: {
             Address opCodeDataAddress = mCpu.getAddressOfOpCodeData(opCode);
             Address effectiveAddress = mCpu.mSystemBus.readAddressAt(opCodeDataAddress);
-            log.hex(effectiveAddress.getBank(), 2).str(":").hex(effectiveAddress.getOffset(), 4).str(", X").sp();
-            log.str("             [Absolute Long Indexed, X]");
+            stream << hex(effectiveAddress.getBank(), 2) << ":" << hex(effectiveAddress.getOffset(), 4) << ", X" << " ";
+            stream << "             [Absolute Long Indexed, X]";
         }
             break;
         case AddressingMode::AbsoluteIndexedWithY:
-            log.hex(mCpu.mSystemBus.readTwoBytes(mCpu.getAddressOfOpCodeData(opCode)), 4).str(", Y").sp();
-            log.str("                    [Absolute Indexed, Y]");
+            stream << hex(mCpu.mSystemBus.readTwoBytes(mCpu.getAddressOfOpCodeData(opCode)), 4)  << ", Y" << " ";
+            stream << "                    [Absolute Indexed, Y]";
             break;
         case AddressingMode::DirectPage:
-            log.hex(mCpu.mSystemBus.readByte(onePlusOpCodeAddress), 2).sp();
-            log.str("                      [Direct Page]");
+            stream << hex(mCpu.mSystemBus.readByte(onePlusOpCodeAddress), 2) << " ";
+            stream << "                      [Direct Page]";
             break;
         case AddressingMode::DirectPageIndexedWithX:
-            log.hex(mCpu.mSystemBus.readByte(onePlusOpCodeAddress), 2).str(", X").sp();
-            log.str("                    [Direct Page Indexed, X]");
+            stream << hex(mCpu.mSystemBus.readByte(onePlusOpCodeAddress), 2)  << ", X" << " ";
+            stream << "                   [Direct Page Indexed, X]";
             break;
         case AddressingMode::DirectPageIndexedWithY:
-            log.hex(mCpu.mSystemBus.readByte(onePlusOpCodeAddress), 2).str(", Y").sp();
-            log.str("                    [Direct Page Indexed, Y]");
+            stream << hex(mCpu.mSystemBus.readByte(onePlusOpCodeAddress), 2)  << ", Y" << " ";
+            stream << "                    [Direct Page Indexed, Y]";
             break;
         case AddressingMode::DirectPageIndirect:
-            log.str("(").hex(mCpu.mSystemBus.readByte(onePlusOpCodeAddress), 2).str(")").sp();
-            log.str("                    [Direct Page Indirect]");
+            stream << "(" << hex(mCpu.mSystemBus.readByte(onePlusOpCodeAddress), 2)  << ")" << " ";
+            stream << "                    [Direct Page Indirect]";
             break;
         case AddressingMode::DirectPageIndirectLong:
-            log.str("[").hex(mCpu.mSystemBus.readByte(mCpu.getAddressOfOpCodeData(opCode)), 2).str("]").sp();
-            log.str("                    [Direct Page Indirect Long]");
+            stream << "[" << hex(mCpu.mSystemBus.readByte(mCpu.getAddressOfOpCodeData(opCode)), 2)  << "]" << " ";
+            stream << "                    [Direct Page Indirect Long]";
             break;
         case AddressingMode::DirectPageIndexedIndirectWithX:
-            log.str("(").hex(mCpu.mSystemBus.readByte(
-                    Address(mCpu.mProgramAddress.getBank(), mCpu.mProgramAddress.getOffset() + 1)), 2).str(", X)").sp();
-            log.str("                    [Direct Page Indexed Indirect, X]");
+            stream << "(" << hex(mCpu.mSystemBus.readByte(
+                                Address(mCpu.mProgramAddress.getBank(), mCpu.mProgramAddress.getOffset() + 1)), 2)  << ", X)" << " ";
+            stream << "                    [Direct Page Indexed Indirect, X]";
             break;
         case AddressingMode::DirectPageIndirectIndexedWithY:
-            log.str("(").hex(mCpu.mSystemBus.readByte(
-                    Address(mCpu.mProgramAddress.getBank(), mCpu.mProgramAddress.getOffset() + 1)), 2).str("), Y").sp();
-            log.str("                    [Direct Page Indirect Indexed, Y]");
+            stream << "(" << hex(mCpu.mSystemBus.readByte(
+                                 Address(mCpu.mProgramAddress.getBank(), mCpu.mProgramAddress.getOffset() + 1)), 2)  << "), Y" << " ";
+            stream << "                    [Direct Page Indirect Indexed, Y]";
             break;
         case AddressingMode::DirectPageIndirectLongIndexedWithY:
-            log.str("[").hex(mCpu.mSystemBus.readByte(mCpu.getAddressOfOpCodeData(opCode)), 2).str("], Y").sp();
-            log.str("                    [Direct Page Indirect Indexed, Y]");
+            stream << "[" << hex(mCpu.mSystemBus.readByte(mCpu.getAddressOfOpCodeData(opCode)), 2)  << "], Y" << " ";
+            stream << "                    [Direct Page Indirect Indexed, Y]";
             break;
         case AddressingMode::StackImplied:
-            log.str("                          [Stack Implied]");
+            stream << "                          [Stack Implied]";
             break;
         case AddressingMode::StackRelative:
-            log.hex(mCpu.mSystemBus.readByte(mCpu.getAddressOfOpCodeData(opCode)), 2).str(", S").sp();
-            log.str("                    [Stack Relative]");
+            stream << hex(mCpu.mSystemBus.readByte(mCpu.getAddressOfOpCodeData(opCode)), 2)  << ", S" << " ";
+            stream << "                    [Stack Relative]";
             break;
         case AddressingMode::StackAbsolute:
             break;
@@ -189,14 +208,14 @@ void Cpu65816Debugger::logOpCode(OpCode &opCode) const {
         case AddressingMode::StackProgramCounterRelativeLong:
             break;
         case AddressingMode::StackRelativeIndirectIndexedWithY:
-            log.str("(").hex(mCpu.mSystemBus.readByte(Address::sumOffsetToAddressWrapAround(mCpu.mProgramAddress, 1)),
-                             2);
-            log.str(", S), Y").sp();
-            log.str("                    [Absolute Indexed, X]");
+            stream << "("
+                   << hex(mCpu.mSystemBus.readByte(Address::sumOffsetToAddressWrapAround(mCpu.mProgramAddress, 1)), 2);
+            stream << ", S), Y" << " ";
+            stream << "                    [Absolute Indexed, X]";
             break;
         case AddressingMode::ProgramCounterRelative:
-            log.hex(mCpu.mSystemBus.readByte(mCpu.getAddressOfOpCodeData(opCode)), 2).sp();
-            log.str("                      [Program Counter Relative]");
+            stream << hex(mCpu.mSystemBus.readByte(mCpu.getAddressOfOpCodeData(opCode)), 2) << " ";
+            stream << "                      [Program Counter Relative]";
             break;
         case AddressingMode::ProgramCounterRelativeLong:
             break;
@@ -204,5 +223,6 @@ void Cpu65816Debugger::logOpCode(OpCode &opCode) const {
             break;
     }
 
-    log.show();
+    std::cout << stream.str() << std::endl;
 }
+

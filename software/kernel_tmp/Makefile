@@ -8,6 +8,7 @@ OBJECTS = $(SOURCES:.s=.o)
 
 kernel_tmp.bin: $(OBJECTS) kernel_tmp.cfg
 	$(LD65) -o kernel_tmp.bin \
+		-Ln kernel_tmp.lbl \
 		-C kernel_tmp.cfg \
 		$(OBJECTS)
 

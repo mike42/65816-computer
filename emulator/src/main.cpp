@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
     auto irq = std::make_shared<InterruptStatus>();
 
     Cpu65816 cpu(systemBus, nmi, irq);
-    Cpu65816Debugger debugger(cpu, symbols);
+    Cpu65816Debugger debugger(cpu, symbols, traceLog);
 
     if(testMode) {
         return executeTestMode(cpu, debugger, symbols);

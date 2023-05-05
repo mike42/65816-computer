@@ -23,6 +23,8 @@ public:
     void loadLabelFile(const std::string &content);
 
     std::map<std::string, Address> labels;
+
+    std::map<uint32_t, std::string> labelsReverse;
 private:
     void loadLabelLine(const std::string &line);
 };

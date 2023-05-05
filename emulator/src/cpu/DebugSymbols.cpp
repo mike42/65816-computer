@@ -64,8 +64,9 @@ void DebugSymbols::loadLabelLine(const std::string &line) {
         // Out of range or not valid hex address
         return;
     }
-    auto address = Address(addrLong & 0xFF0000 >> 4, addrLong & 0xFFFF);
+    auto address = Address(addrLong & 0xFF0000 >> 16, addrLong & 0xFFFF);
     labels.insert({name, address});
+    labelsReverse.insert({addrLong & 0xFFFFFF, name});
 }
 
 void DebugSymbols::loadLabelFile(const std::string &content) {

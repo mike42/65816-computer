@@ -30,7 +30,7 @@
 
 class Cpu65816Debugger {
 public:
-    Cpu65816Debugger(Cpu65816 &, DebugSymbols &);
+    Cpu65816Debugger(Cpu65816 &cpu, DebugSymbols &symbols, bool &trace);
 
     void step();
     void setBreakPoint(const Address &);
@@ -55,6 +55,7 @@ private:
 
     Cpu65816 &mCpu;
     DebugSymbols &mSymbols;
+    bool mTrace;
 };
 
 #endif // EMULATOR_CPU65816DEBUGGER_H
