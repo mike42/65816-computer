@@ -21,6 +21,8 @@ public:
     uint8_t readByte(const Address &) override;
     bool decodeAddress(const Address &, Address &) override;
     void loadFromFile(const std::string& fileName, const Address& start, size_t size);
+
+    size_t mRamSize;
 };
 
 #endif //EMULATOR_RAM_H
