@@ -28,7 +28,7 @@ main_emulator.o: main.s
 	$(CA65) --feature string_escapes --cpu 65816 --debug-info $<
 
 clean:
-	rm -f rom.bin rom_emulator.bin rom_at28c256.bin rom_sst39lf010.bin address.o interrupt.o main_emulator.o post.o sd_card.o uart.o vectors.o xmodem.o nop.bin rom.txt
+	rm -f rom.bin rom_emulator.bin rom.lbl rom_emulator.lbl rom_at28c256.bin rom_sst39lf010.bin address.o interrupt.o main_emulator.o post.o sd_card.o uart.o vectors.o xmodem.o nop.bin rom.txt
 
 # AT28C256 - Used in 5 V system.
 rom_at28c256.bin: rom.bin

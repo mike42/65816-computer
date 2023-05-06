@@ -157,6 +157,7 @@ block_count_2 := 7
     clc
     adc #512
     sta <L2+dest_address_0
+    inc <L2+block_number_low_1      ; Wind block number forward by 1
     jmp @next_block
 L4:
     lda <L2+1
