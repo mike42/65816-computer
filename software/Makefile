@@ -1,6 +1,6 @@
 EMULATOR=../emulator/cmake-build-debug/emulator
 
-.PHONY: bootloader kernel kernel_tmp snake clean all
+.PHONY: bootloader kernel kernel_tmp snake hexdump clean all
 
 all: kernel disk.img ramfs.bin snake
 
@@ -31,11 +31,11 @@ snake.img: bootloader snake
 hexdump.img: bootloader hexdump
 	cat bootloader/boot.bin hexdump/hexdump.bin > hexdump.img
 
-
 clean:
 	make -C bootloader clean
 	make -C kernel clean
 	make -C kernel_tmp clean
+	make -C hexdump clean
 	rm -f ramfs.bin disk.img
 
 run: kernel ramfs.bin
