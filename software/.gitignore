@@ -1,4 +1,5 @@
 *.bin
 *.o
 *.img
-
+*.lbl
+*.dbg

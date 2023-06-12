@@ -1,4 +1,4 @@
 *.bin
 *.o
+*.lbl
 
-rom.txt
