@@ -1,4 +1,4 @@
-# 65816 computer
+# 65816 computer ![example branch parameter](https://github.com/mike42/65816-computer/actions/workflows/build.yml/badge.svg?branch=main)
 
 This is a prototype 65C816-based computer. It features a 1.8432 MHz processor, 1 megabyte of static RAM, a 65C22 I/O port, and an NXP SC16C752 dual UART.
 
@@ -22,7 +22,7 @@ This is a learning project, and I am blogging about it as I progress.
 
 ## Licenses & acknowledgement
 
-With the exception of the files noted below, this work is © 2022 Michael Billington, and is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/).
+With the exception of the files noted below, this work is © 2022-2023 Michael Billington, and is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/).
 
 ### 65816 emulator
 
