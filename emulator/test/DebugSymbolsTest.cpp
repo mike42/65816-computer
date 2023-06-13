@@ -10,6 +10,9 @@ TEST(DebugSymbols, CanParseFile) {
     ASSERT_EQ(3, symbols.labels.size());
     ASSERT_TRUE(symbols.labels.contains("test_this_will_pass"));
     ASSERT_EQ(0xe001, symbols.labels["test_this_will_pass"].getOffset());
+    ASSERT_TRUE(symbols.labels.contains("test_this_will_fail"));
+    ASSERT_EQ(0xe004, symbols.labels["test_this_will_fail"].getOffset());
+    ASSERT_EQ(0x00, symbols.labels["test_this_will_fail"].getBank());
 }
 
 TEST(DebugSymbols, CanNameAddress) {
