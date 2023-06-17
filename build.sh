@@ -18,3 +18,6 @@ make -C rom all
 # Build software
 make -C software disk.img hexdump.img snake.img
 
+# Run some tests
+make -C software/snake/ test
+

@@ -18,17 +18,17 @@ std::shared_ptr<TerminalWrapper> getTerminalWrapper(bool mode);
 
 namespace po = boost::program_options;
 
-int executeTestRoutine(Cpu65816& cpu, Cpu65816Debugger &debugger, const Address &address) {
+int executeTestRoutine(Cpu65816& cpu, Cpu65816Debugger &debugger, const Address &address, bool &breakPointHit) {
     // Track stack pointer so we know when this returns
     uint16_t startOffset = cpu.getStack()->getStackPointer();
     // Imitate jsr instruction
     cpu.getStack()->push16Bit(0x0000);
     cpu.setProgramAddress(address);
-    while (cpu.getStack()->getStackPointer() < startOffset) {
+    while (cpu.getStack()->getStackPointer() < startOffset && !breakPointHit) {
         debugger.step();
     }
     // Return A register when subroutine returns
-    return cpu.getA();
+    return breakPointHit ? 1 : cpu.getA();
 }
 
 int executeTestMode(Cpu65816 &cpu, Cpu65816Debugger &debugger, DebugSymbols symbols) {
@@ -46,7 +46,7 @@ int executeTestMode(Cpu65816 &cpu, Cpu65816Debugger &debugger, DebugSymbols symb
     if(symbols.labels.contains("test_setup")) {
         Address testSetupRoutine = symbols.labels["test_setup"];
         std::cerr << std::left << std::setw(testWidth) << "test_setup";
-        uint16_t setupResult = executeTestRoutine(cpu, debugger, testSetupRoutine);
+        uint16_t setupResult = executeTestRoutine(cpu, debugger, testSetupRoutine, breakPointHit);
         if(setupResult != 0) {
             std::cerr << " [ FAIL ]" << std::endl;
             return 1;
@@ -65,7 +65,7 @@ int executeTestMode(Cpu65816 &cpu, Cpu65816Debugger &debugger, DebugSymbols symb
         }
         std::cerr << std::left << std::setw(testWidth) << label;
         // Run the test
-        uint16_t testResult = executeTestRoutine(cpu, debugger, itr.second);
+        uint16_t testResult = executeTestRoutine(cpu, debugger, itr.second, breakPointHit);
         // Record result
         testsExecuted++;
         if(testResult == 0) {

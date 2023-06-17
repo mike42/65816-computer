@@ -110,8 +110,11 @@ void Cpu65816::executeStatusReg(OpCode &opCode) {
                 mCpuStatus.setIndexWidthFlag();
             }
 
-            // New stack
-            mStack = Stack(&mSystemBus);
+            if(mCpuStatus.emulationFlag()) {
+                // Set stack high to 01 if in emulation mode, otherwise maintain stack.
+                uint16_t newStackPointer = 0x0100 + (mStack.getStackPointer() & 0xff);
+                mStack = Stack(&mSystemBus,newStackPointer);
+            }
 
             addToProgramAddressAndCycles(1, 2);
             break;

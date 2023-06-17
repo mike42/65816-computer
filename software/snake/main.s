@@ -145,29 +145,6 @@ __snake_frame:
     jsr __snake_advance
     rts
 
-;#define RAND_MAX 65535
-;void srand(uint16_t value)
-; TODO unported code
-__srand:
-;    random_state = value + 1;
-;    if(random_state == 0) {
-;        // Random state must never be 0!
-;        random_state++;
-;    }
-    rts
-
-; TODO unported code
-;uint16_t rand()
-__rand:
-;    // This is a 16-bit Xorshift https://en.wikipedia.org/wiki/Xorshift
-;    // 7,9,13 triplet is from http://www.retroprogramming.com/2017/07/xorshift-pseudorandom-numbers-in-z80.html
-;    random_state ^= random_state >> 7;
-;    random_state ^= random_state << 9;
-;    random_state ^= random_state >> 13;
-;    return random_state - 1; // to match built-in rand.
-    lda #0
-    rts
-
 ; Equivalent of printw("%s", str);
 ;__printstr:
 ;    lda 3, S
