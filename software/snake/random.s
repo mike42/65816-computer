@@ -34,17 +34,47 @@ random_state_nonzero:               ; }
     tcs
     rts
 
-; TODO unported code
 ;uint16_t rand()
+; This is a 16-bit Xorshift https://en.wikipedia.org/wiki/Xorshift
+; 7,9,13 triplet is from http://www.retroprogramming.com/2017/07/xorshift-pseudorandom-numbers-in-z80.html
 __rand:
     .a16
     .i16
-
-;    // This is a 16-bit Xorshift https://en.wikipedia.org/wiki/Xorshift
-;    // 7,9,13 triplet is from http://www.retroprogramming.com/2017/07/xorshift-pseudorandom-numbers-in-z80.html
-;    random_state ^= random_state >> 7;
-;    random_state ^= random_state << 9;
-;    random_state ^= random_state >> 13;
-;    return random_state - 1; // to match built-in rand.
-    lda #0
+    lda random_state                ; random_state ^= random_state >> 7;
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    eor random_state
+    sta random_state                ; random_state ^= random_state << 9;
+    asl
+    asl
+    asl
+    asl
+    asl
+    asl
+    asl
+    asl
+    asl
+    eor random_state
+    sta random_state                ; random_state ^= random_state >> 13;
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    eor random_state
+    sta random_state
+    dec                             ; return random_state - 1; // to match built-in rand.
     rts

@@ -1,5 +1,5 @@
 .segment "CODE"
-.import __srand, random_state, RAND_MAX
+.import __srand, random_state, RAND_MAX, __rand
 
 test_setup:
     clc                             ; switch to native mode
@@ -35,4 +35,29 @@ test_srand_does_not_allow_zero:
     lda #1                          ; assertion failed
     rts
 :   lda #0                          ; test passed
+    rts
+
+test_rand:
+    ; generate some numbers to check the algorithm is correct: expected values found by running C implementation first.
+    .a16
+    .i16
+    lda #123                        ; seed number generator with 123
+    pha
+    jsr __srand
+    jsr __rand                      ; generate 3 random numbers
+    cmp #63610                      ; first expected is 63610
+    beq :+
+    lda #1                          ; assertion failed
+    rts
+:   jsr __rand
+    cmp #61323                      ; second expected is 61323
+    beq :+
+    lda #1                          ; assertion failed
+    rts
+:   jsr __rand
+    cmp #18512                      ; third expected is 18512
+    beq :+
+    lda #1                          ; assertion failed
+    rts
+:   lda #0                          ; test passes
     rts
