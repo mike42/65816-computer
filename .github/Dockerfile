@@ -7,8 +7,8 @@ RUN apt-get update && \
   clang \
   cc65 \
   libgtest-dev \
-  libboost1.74-dev \
-  libboost-program-options1.74-dev \
-  libboost-filesystem1.74-dev && \
+  libboost-dev \
+  libboost-program-options-dev \
+  libboost-filesystem-dev && \
   rm -rf /var/lib/apt/lists/*
 

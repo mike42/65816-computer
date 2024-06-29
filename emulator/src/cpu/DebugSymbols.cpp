@@ -3,6 +3,8 @@
 #include "boost/filesystem.hpp"
 #include <boost/tokenizer.hpp>
 #include <string>
+#include <fstream>
+#include <iostream>
 #include "Log.h"
 
 #define LOG_TAG "DebugSymbols"
@@ -12,20 +14,22 @@ void DebugSymbols::loadSymbolsForBinary(const boost::filesystem::path &imagePath
     boost::filesystem::path debugPath = p.replace_extension(".dbg");
     if (boost::filesystem::exists(debugPath)) {
         Log::dbg(LOG_TAG).str("Found debug symbols, loading this format is not implemented: ").str(
-                debugPath.c_str()).show();
+            debugPath.c_str()).show();
     }
     boost::filesystem::path labelPath = p.replace_extension(".lbl");
     if (boost::filesystem::exists(labelPath)) {
         Log::vrb(LOG_TAG).str("Loading labels: ").str(labelPath.c_str()).show();
-        std::string content;
-        boost::filesystem::load_string_file(labelPath, content);
+        std::ifstream istream(labelPath, std::ios::binary);
+        std::ostringstream ostream;
+        ostream << istream.rdbuf();
+        std::string content = ostream.str();
         DebugSymbols::loadLabelFile(content);
     }
 }
 
 void DebugSymbols::loadLabelLine(const std::string &line) {
     // input format: "al 00E001 .some_label"
-    typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
     boost::char_separator<char> sep{" "};
     tokenizer tok{line, sep};
     // iterate space-separated tokens within the line
@@ -40,7 +44,7 @@ void DebugSymbols::loadLabelLine(const std::string &line) {
         } else if (i == 1) {
             addrString = t;
         } else if (i == 2) {
-            if(t.starts_with('.')) {
+            if (t.starts_with('.')) {
                 // Trim expected leading '.'
                 name = t.substr(1);
             } else {
@@ -79,5 +83,4 @@ void DebugSymbols::loadLabelFile(const std::string &content) {
 }
 
 DebugSymbols::DebugSymbols() : labels() {
-
 }

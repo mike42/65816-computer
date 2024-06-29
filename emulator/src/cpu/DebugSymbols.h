@@ -2,7 +2,8 @@
 #define EMULATOR_DEBUGSYMBOLS_H
 
 #include <boost/filesystem/path.hpp>
-#include "string"
+#include <map>
+#include <string>
 #include "SystemBusDevice.h"
 
 class DebugSymbols {
